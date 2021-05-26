@@ -1,0 +1,19 @@
+{
+  "name": "package.json",
+  "version": "1.0.0",
+  "description": "OPC P5 Les petits plats",
+  "main": "index.js",
+  "scripts": {
+    "sass": "sass --watch ./sass/main.scss:./public/css/style.css"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BenjaminBelardi/P5-Les-Petits-Plats-Dev.git"
+  },
+  "author": "Belardi Benjamin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BenjaminBelardi/P5-Les-Petits-Plats-Dev/issues"
+  },
+  "homepage": "https://github.com/BenjaminBelardi/P5-Les-Petits-Plats-Dev#readme"
+}
