@@ -1,0 +1,15 @@
+.bold{
+    font-weight: 700;
+}
+.card{
+    &__txt{
+        color: black;
+    }
+    &__header > h3{
+        font-size: 18px;
+    }
+
+    &__body{
+        font-size: 12px;
+    }
+}
