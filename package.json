@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "OPC P5 Les petits plats",
   "main": "index.js",
-  "type": "module",
   "scripts": {
     "sass": "sass --watch ./sass/main.scss:./public/css/style.css"
   },

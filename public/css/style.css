@@ -50,28 +50,78 @@
   font-size: 2rem;
 }
 
+.tag {
+  display: block;
+  margin-left: 5rem;
+  width: 80%;
+}
+.tag__ingredient {
+  display: block;
+}
+.tag__search {
+  max-width: 100%;
+  background-color: #3282F7;
+  border: unset;
+  outline: unset;
+  border-radius: 5px 5px 5px 5px;
+  height: 3rem;
+  padding-left: 1rem;
+}
 .tag__list {
   display: none;
 }
+.tag__icon-up {
+  display: none;
+}
+.tag__icon-down {
+  margin-left: -1.5rem;
+}
 
-.tag__search:focus + .tag__list {
+.tag__search:focus {
+  max-width: 667px;
+  width: 100%;
+}
+
+.displayed {
   display: flex;
+  position: absolute;
+  z-index: 1;
   flex-direction: column;
   flex-wrap: wrap;
   justify-content: space-between;
-  max-height: 600px;
+  max-width: 667px;
+  max-height: 1900px;
+  width: 100%;
   background-color: #3282F7;
+  opacity: 1;
   padding: 10px;
-  border-radius: 5px;
-  overflow: scroll;
+  border-radius: 0 0 5px 5px;
+  list-style: none;
+  cursor: pointer;
 }
 
-.opt {
+.tag__filter {
   padding: 10px;
   color: white;
 }
-.opt:hover {
+.tag__filter:hover {
   background-color: #63a0f9;
+}
+
+.selected {
+  background-color: #63a0f9;
+}
+
+.filterActive {
+  display: inline-block;
+  background-color: #3282F7;
+  padding: 0.7rem 1.25rem;
+  border-radius: 5px;
+  margin: auto 5px 5px auto;
+  color: white;
+}
+.filterActive i {
+  margin-left: 1rem;
 }
 
 .header {

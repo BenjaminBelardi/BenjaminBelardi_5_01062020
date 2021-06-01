@@ -28,12 +28,19 @@
                 </span>
             </button>
         </div>
-        <div class="tag">
+        <div class="tag" id="filterTag">
             <div class="tag__ingredient">
-                <input class="tag__search" type="text" list="mySelectIngredients" placeholder="Ingredient">
-                <div class="tag__list" id="mySelectIngredients" multiple="">
+                <input class="tag__search" type="text" id="mySearchIngredient" placeholder="Ingredient">
+                <span class="tag__icon-down">
+                    <i class="fa fa-chevron-down"></i>
+                </span>
+                <span class="tag__icon-up">
+                    <i class="fa fa-chevron-up"></i>
+                </span>
+                <ul class="tag__list" id="myIngredientsList">
                 
-                </div>
+                </ul>
+            </div>
         </div>
 
     </section>

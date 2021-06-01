@@ -1,31 +1,113 @@
 
-// .tag__list{
-//     display: flex;
-//     max-width: 60rem;
-//     flex-wrap: wrap;
-//     justify-content: space-between;
+.tag{
+    display: block;
+    margin-left: 5rem;
+    width: 80%;
+    &__ingredient{
+        display: block
+    }
+    &__search{
+        max-width: 100%;
+        background-color: $tag-ingredient-color;
+        border: unset;
+        outline: unset;
+        border-radius: 5px 5px 5px 5px;
+        height: 3rem;
+        padding-left: 1rem;
+    }
+    &__list{
+         display :none;
+    }
+    &__icon-up{
+         display: none;
+    }
+    &__icon-down{
+        margin-left: -1.5rem;
+   }
 
-// }
-.tag__list{
-    display :none;
+
+
+//    &[tag-selected]::before{
+//     content: attr(data-selected);
+//     font-size: 0.4em;
+//     color: #e54858;
+//     display: block;
+//     margin-top: 7px;
+//     margin-bottom: 7px;
+//     text-align: right;
+//     line-height: 0.3;
+//     opacity: 0;
+//     transition: 0.3s;
+//    }
 }
 
-.tag__search:focus + .tag__list{
-    display :flex;
-    flex-direction: column;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    max-height: 600px;
-    background-color:$tag-ingredient-color;
-    padding: 10px;
-    border-radius: 5px;
-    overflow:scroll;
+ .tag__search:focus{
+     max-width: 667px;
+     width: 100%;
+//     &~ .tag__list{
+//         display :flex;
+//         position: absolute;
+//         z-index: 1;
+//         flex-direction: column;
+//         flex-wrap: wrap;
+//         justify-content: space-between;
+//         max-height: 600px;
+//         max-width: 80%;
+//         width: 100%;
+//         background-color:$tag-ingredient-color;
+//         opacity: 1;
+//         padding: 10px;
+//         border-radius: 5px;
+//         overflow:scroll;
+//         cursor:pointer;
+//     }
+//     &~ .tag__icon-down{
+//         display: none;
+//     }
+//     &~ .tag__icon-up{
+//         display: inline-block;
+//         margin-left: -1.5rem;
+//     }  
 
-}
-.opt{
+ }
+
+.displayed{
+            display :flex;
+            position:absolute;
+            z-index: 1;
+            flex-direction: column;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            max-width: 667px;
+            max-height: 1900px;
+            width: 100%;
+            background-color:$tag-ingredient-color;
+            opacity: 1;
+            padding: 10px;
+            border-radius: 0 0 5px 5px;
+            list-style: none;
+            cursor:pointer;
+        }
+.tag__filter{
     padding: 10px;
     color: white;
     &:hover{
         background-color:lighten($tag-ingredient-color, $amount: 10);
+    }
+}
+
+.selected{
+    background-color:lighten($tag-ingredient-color, $amount: 10);
+}
+
+.filterActive{
+    display: inline-block;
+    background-color:$tag-ingredient-color;
+    padding: .7rem 1.25rem;
+    border-radius: 5px;
+    margin: auto 5px 5px auto;
+    color: white;
+    & i{
+        margin-left: 1rem;
     }
 }
