@@ -14,6 +14,7 @@
         border-radius: 5px 5px 5px 5px;
         height: 3rem;
         padding-left: 1rem;
+        color: white;
     }
     &__list{
          display :none;
@@ -25,20 +26,6 @@
         margin-left: -1.5rem;
    }
 
-
-
-//    &[tag-selected]::before{
-//     content: attr(data-selected);
-//     font-size: 0.4em;
-//     color: #e54858;
-//     display: block;
-//     margin-top: 7px;
-//     margin-bottom: 7px;
-//     text-align: right;
-//     line-height: 0.3;
-//     opacity: 0;
-//     transition: 0.3s;
-//    }
 }
 
  .tag__search:focus{
@@ -61,13 +48,13 @@
 //         overflow:scroll;
 //         cursor:pointer;
 //     }
-//     &~ .tag__icon-down{
-//         display: none;
-//     }
-//     &~ .tag__icon-up{
-//         display: inline-block;
-//         margin-left: -1.5rem;
-//     }  
+    &~ .tag__icon-down{
+        display: none;
+    }
+    &~ .tag__icon-up{
+        display: inline-block;
+        margin-left: -1.5rem;
+    }  
 
  }
 

@@ -66,6 +66,7 @@
   border-radius: 5px 5px 5px 5px;
   height: 3rem;
   padding-left: 1rem;
+  color: white;
 }
 .tag__list {
   display: none;
@@ -80,6 +81,13 @@
 .tag__search:focus {
   max-width: 667px;
   width: 100%;
+}
+.tag__search:focus ~ .tag__icon-down {
+  display: none;
+}
+.tag__search:focus ~ .tag__icon-up {
+  display: inline-block;
+  margin-left: -1.5rem;
 }
 
 .displayed {
