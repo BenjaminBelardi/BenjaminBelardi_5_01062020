@@ -124,7 +124,6 @@ function addSelectedTag(elt, selectedTag) {
     filter.classList.add('filterActive')
     //filter.innerText = selectedTag;
     tagFilter.insertBefore(filter, tagFilter.firstChild)
-
     //creat new icon close element
     let icon = document.createElement('i');
     icon.classList.add('far', 'fa-times-circle');
@@ -134,24 +133,28 @@ function addSelectedTag(elt, selectedTag) {
 
 //event to display tag list on input search event
 let myIngredientsList = document.getElementById("myIngredientsList");
+let iconDown = document.querySelector(".tag__icon-down");
+let iconUp = document.querySelector(".tag__icon-up");
 let myIngredient = document.getElementById("mySearchIngredient");
-myIngredient.addEventListener('click', function () {
-    myIngredientsList.classList.toggle("displayed");
+myIngredient.addEventListener('click', function (e) {
+    e.stopPropagation;
+    myIngredientsList.classList.toggle("displayedList");
 });
 myIngredient.addEventListener('input',SearchIngredient);
 function SearchIngredient(event){
     let regEx = new RegExp("^("+event.target.value+")",'i');
-    let result = [];
     console.log(regEx);
-    ingredientFilter.elements.forEach(element => {
-        if(element.match(regEx) != null){
-        result.push(element.match(regEx).input);
-        ingredientFilter._delFilter(element.match(regEx).input);
-        ingredientFilter._modifieFilterOnDom("myIngredientsList");
+    let testfilter = ingredientFilter.elements.filter(function(element){
+        if(element.match(regEx)!= null){
+            return true;
+        }else{
+            return false
         }
     });
-    
-
+    let ingredientFilterNew = new Filters("ingredient");
+    ingredientFilterNew.elements = testfilter;
+    ingredientFilterNew._modifieFilterOnDom("myIngredientsList");
+    console.table(testfilter) 
 }
 
 // function to get the user filter choise
@@ -178,6 +181,50 @@ function getDataTag(event) {
     })
 }
 
+//// cards creation
+let results = [{
+    title: "test",
+    time: "10min",
+    ingredients: `<li><span class="bold">Lait de coco: </span>400ml</li>
+                    <li><span class="bold">Lait de coco: </span>400ml</li>`,
+    description:  `Mettre les glaçons à votre goût dans le blender,ajouter le lait,
+     la crème de coco, le jus de 2 citrons et le sucre.Mixer jusqu'à avoir la consistence désirée`
+},
+{
+    title: "test2",
+    time: "100min",
+    ingredients: `<li><span class="bold">Lait de coco: </span>400ml</li>
+                    <li><span class="bold">Lait de coco: </span>400ml</li>`,
+    description :  `Mettre les glaçons à votre goût dans le blender,ajouter le lait,
+     la crème de coco, le jus de 2 citrons et le sucre.Mixer jusqu'à avoir la consistence désirée`
+}];
 
+const cardTemplate =`
+    ${results.map(result =>`
+    <div class="card">
+        <a class="card__link--color" href="#" title="">
+            <div class="card__img">
+            </div>
+            <div class="card__txt">
+                <div class="card__header">
+                    <h3>${result.title}</h3>
+                    <span class="card__header__time bold">
+                        <i class="far fa-clock"></i> ${result.time}
+                    </span>
+                </div>
+                <div class="card__body">
+                    <ul class="card__body__list">
+                        ${result.ingredients}
+                    </ul>
+                    <p class="card__body__description"> ${result.description}</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    `)
+}`;
+
+let myRecipesList = document.getElementById("testCard");
+myRecipesList.innerHTML = cardTemplate;
 
 

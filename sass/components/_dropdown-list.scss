@@ -28,37 +28,15 @@
 
 }
 
- .tag__search:focus{
-     max-width: 667px;
-     width: 100%;
-//     &~ .tag__list{
-//         display :flex;
-//         position: absolute;
-//         z-index: 1;
-//         flex-direction: column;
-//         flex-wrap: wrap;
-//         justify-content: space-between;
-//         max-height: 600px;
-//         max-width: 80%;
-//         width: 100%;
-//         background-color:$tag-ingredient-color;
-//         opacity: 1;
-//         padding: 10px;
-//         border-radius: 5px;
-//         overflow:scroll;
-//         cursor:pointer;
-//     }
-    &~ .tag__icon-down{
-        display: none;
-    }
-    &~ .tag__icon-up{
-        display: inline-block;
-        margin-left: -1.5rem;
-    }  
-
+ .displayIcon{
+    display: inline-block;
+    margin-left: -1.5rem;
+ }
+ .hidden{
+     display: none;
  }
 
-.displayed{
+.displayedList{
             display :flex;
             position:absolute;
             z-index: 1;
