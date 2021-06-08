@@ -1,10 +1,4 @@
 import {recipes} from "./recipes.js";
-// tag list creation from recipes table
-let ingredients = [];
-let ustensils = [];
-let sortIngedients = [];
-let sortUstensils = [];
-
 
 class Filters {
     constructor(name) {
@@ -43,63 +37,74 @@ class Filters {
             list.removeChild(list.firstChild);
         }
         this._displayFilterOnDom(identifier);
-
     }
 }
 class Product {
 
     constructor(name) {
-        this.name = name
-        this.ingredients = []
-        this.ustensils = []
+        this.name = name;
+        this.ingredients = [];
+        this.ustensils = [];
+        this.description = "";
+        this.time;
     }
 
-    _addIngredients(ingredients) {
-        this.ingredients = ingredients
+    __addProduct(ingredients,ustensils,appliance,description,time){
+        this.ingredients = ingredients;
+        this.ustensils = ustensils;
+        this.description = description;
+        this.appliance = appliance;
+        this.time = time;
     }
-
-    _addUstensils(ustencils) {
-        this.ustensils = ustencils
-    }
-
+    // _addUstensils(ustencils) {
+    //     this.ustensils = ustencils
+    // }
     _hasIngredients(ingredientName) {
         return this.ingredients.includes(ingredientName)
     }
 }
 
-
 let ingredientFilter = new Filters("ingredient")
 let ustensilsFilter = new Filters("ustensils")
+let applianceFilter = new Filters("appliance")
 let allProducts = []
 recipes.forEach(element => {
     // initialisation
-    let oneProduct = new Product(element.name)
-    let allProductIngredients = []
-    let allProductUstensils = []
+    let oneProduct = new Product(element.name);
+    let allProductIngredients = [];
+    let allProductUstensils = [];
+    let ProductAppliance = "";
+    let ProductDescription ="";
+    let ProductTime="";
 
     // On parcours et rempli les élements
     element.ingredients.forEach(element => {
+        let str ="";
         ingredientFilter._addFilter(element.ingredient)
-        allProductIngredients.push(element.ingredient)
+        allProductIngredients.push([element.ingredient + ": " , (typeof element.quantity === "number" && typeof element.unit === "string") ? str.concat(element.quantity ,element.unit.substring(0,2)):(typeof element.quantity === "number")? element.quantity: ""])
     })
     element.ustensils.forEach(element => {
         ustensilsFilter._addFilter(element)
         allProductUstensils.push(element)
     });
+    applianceFilter._addFilter(element.appliance);
+    ProductAppliance = element.appliance;
+    ProductDescription = element.description;
+    ProductTime = element.time + " min";
 
     // On stocke
-    oneProduct._addIngredients(allProductIngredients)
-    oneProduct._addUstensils(allProductUstensils)
+    // oneProduct._addIngredients(allProductIngredients)
+    // oneProduct._addUstensils(allProductUstensils)
+    oneProduct.__addProduct(allProductIngredients,allProductUstensils, ProductAppliance,ProductDescription,ProductTime)
     allProducts.push(oneProduct)
 });
-
-
 
 //******************************DOM************************
 
 //affichage de la liste complete de tag à l'initialisation de la page
-ingredientFilter._displayFilterOnDom("myIngredientsList")
-//ustensilsFilter._displayFilterOnDom("myUstensilsList")
+ingredientFilter._displayFilterOnDom("myIngredientsList");
+ustensilsFilter._displayFilterOnDom("myUstensilsList");
+applianceFilter._displayFilterOnDom("myAppliancesList");
 
 //supression des tag précédemment sélectionné par l'utilisateur et mise à jour de la liste de filtres
 document.getElementById('filterTag').addEventListener('click',function(event){
@@ -110,9 +115,6 @@ document.getElementById('filterTag').addEventListener('click',function(event){
     }
 });
 
-
-
-
 //ajoute du filtre selectionné par l'utilisateur sous forme de tag au dessus du champ de recherche
 let tagFilter = document.getElementById("filterTag");
 function addSelectedTag(elt, selectedTag) {
@@ -121,43 +123,89 @@ function addSelectedTag(elt, selectedTag) {
     // create text node to add to span element
     filter.appendChild(document.createTextNode(selectedTag));
     // set inner text property of span and add filterActive class
-    filter.classList.add('filterActive')
-    //filter.innerText = selectedTag;
-    tagFilter.insertBefore(filter, tagFilter.firstChild)
+    filter.classList.add('filterActive');
+    tagFilter.insertBefore(filter, tagFilter.firstChild);
     //creat new icon close element
     let icon = document.createElement('i');
     icon.classList.add('far', 'fa-times-circle');
     filter.appendChild(icon);
 }
 
-
 //event to display tag list on input search event
 let myIngredientsList = document.getElementById("myIngredientsList");
-let iconDown = document.querySelector(".tag__icon-down");
-let iconUp = document.querySelector(".tag__icon-up");
-let myIngredient = document.getElementById("mySearchIngredient");
-myIngredient.addEventListener('click', function (e) {
-    e.stopPropagation;
-    myIngredientsList.classList.toggle("displayedList");
-});
-myIngredient.addEventListener('input',SearchIngredient);
-function SearchIngredient(event){
+let myUstensilsList = document.getElementById("myUstensilsList");
+let myApplianceList =  document.getElementById("myAppliancesList");
+let myTagList = document.querySelectorAll('.tag__search');
+myTagList.forEach(tagList => {tagList.addEventListener('click', OpenFilter)});
+function OpenFilter(event) {
+    switch (event.target.id) {
+        case "mySearchIngredient":
+            event.stopPropagation;
+            myIngredientsList.classList.toggle("displayedList");
+            break;
+        case "mySearchAppliance":
+            event.stopPropagation;
+            myApplianceList.classList.toggle("displayedList");
+            break;
+        case "mySearchUstensil":
+            event.stopPropagation;
+            myUstensilsList.classList.toggle("displayedList");
+            break;
+
+        default:
+             break;
+     } 
+}
+//search and filtered tag from the tag list 
+myTagList.forEach(tagList => {tagList.addEventListener('input', SearchTag)});
+function SearchTag(event){
     let regEx = new RegExp("^("+event.target.value+")",'i');
-    console.log(regEx);
-    let testfilter = ingredientFilter.elements.filter(function(element){
-        if(element.match(regEx)!= null){
-            return true;
-        }else{
-            return false
-        }
-    });
-    let ingredientFilterNew = new Filters("ingredient");
-    ingredientFilterNew.elements = testfilter;
-    ingredientFilterNew._modifieFilterOnDom("myIngredientsList");
-    console.table(testfilter) 
+    switch (event.target.id) {
+        case "mySearchIngredient":
+            event.stopPropagation;
+            let filterIngredient = ingredientFilter.elements.filter(function(element){
+                if(element.match(regEx)!= null){
+                    return true;
+                }else{
+                    return false
+                }
+            });
+            let ingredientFilterNew = new Filters("ingredient");
+            ingredientFilterNew.elements = filterIngredient;
+            ingredientFilterNew._modifieFilterOnDom("myIngredientsList");
+            break;
+        case "mySearchAppliance":
+            event.stopPropagation;
+            let filterAppliance = applianceFilter.elements.filter(function(element){
+                if(element.match(regEx)!= null){
+                    return true;
+                }else{
+                    return false
+                }
+            });
+            let applianceFilterNew = new Filters("appliance");
+            applianceFilterNew.elements = filterAppliance;
+            applianceFilterNew._modifieFilterOnDom("myAppliancesList");
+            break;
+        case "mySearchUstensil":
+            event.stopPropagation;
+            let filterUstensil = ustensilsFilter.elements.filter(function(element){
+                if(element.match(regEx)!= null){
+                    return true;
+                }else{
+                    return false
+                }
+            });
+            let ustensilsFilterNew = new Filters("ustensil");
+            ustensilsFilterNew.elements = filterUstensil;
+            ustensilsFilterNew._modifieFilterOnDom("myUstensilsList");
+            break;
+        default:
+             break;
+    }
 }
 
-// function to get the user filter choise
+//add the tag selected by the user
 document.querySelector("ul").addEventListener('click', getDataTag);
 function getDataTag(event) {
     event.target.classList.toggle("selected");
@@ -165,7 +213,7 @@ function getDataTag(event) {
     ingredientFilter._modifieFilterOnDom("myIngredientsList");
     addSelectedTag(event.target.parentNode, event.target.innerText);
     // en admettons ceci : let results contient les choix utilisateurs
-    let results = ["creme fraiche", "sel"]
+    //let results = ["creme fraiche", "sel"]
     let productThatContainsAllResults = []
     allProducts.forEach(oneProduct => {
         let hasProductAllResult = true
@@ -177,28 +225,11 @@ function getDataTag(event) {
         if (hasProductAllResult) {
             productThatContainsAllResults.push(oneProduct.name)
         }
-
     })
 }
-
-//// cards creation
-let results = [{
-    title: "test",
-    time: "10min",
-    ingredients: `<li><span class="bold">Lait de coco: </span>400ml</li>
-                    <li><span class="bold">Lait de coco: </span>400ml</li>`,
-    description:  `Mettre les glaçons à votre goût dans le blender,ajouter le lait,
-     la crème de coco, le jus de 2 citrons et le sucre.Mixer jusqu'à avoir la consistence désirée`
-},
-{
-    title: "test2",
-    time: "100min",
-    ingredients: `<li><span class="bold">Lait de coco: </span>400ml</li>
-                    <li><span class="bold">Lait de coco: </span>400ml</li>`,
-    description :  `Mettre les glaçons à votre goût dans le blender,ajouter le lait,
-     la crème de coco, le jus de 2 citrons et le sucre.Mixer jusqu'à avoir la consistence désirée`
-}];
-
+//********************* cards creation ****************************************
+let results = allProducts;
+// litéral template for automatic cards creation
 const cardTemplate =`
     ${results.map(result =>`
     <div class="card">
@@ -207,24 +238,23 @@ const cardTemplate =`
             </div>
             <div class="card__txt">
                 <div class="card__header">
-                    <h3>${result.title}</h3>
+                    <h3>${result.name}</h3>
                     <span class="card__header__time bold">
                         <i class="far fa-clock"></i> ${result.time}
                     </span>
                 </div>
                 <div class="card__body">
                     <ul class="card__body__list">
-                        ${result.ingredients}
+                        ${result.ingredients.map(ingredient =>`<li><span class="bold">${ingredient[0]}</span>${ingredient[1]}</li>`).join("")}
                     </ul>
-                    <p class="card__body__description"> ${result.description}</p>
+                    <p class="card__body__description"><span> ${result.description}</span></p>
                 </div>
             </div>
         </a>
     </div>
     `)
 }`;
-
-let myRecipesList = document.getElementById("testCard");
+let myRecipesList = document.getElementById("recipesList");
 myRecipesList.innerHTML = cardTemplate;
 
 

@@ -1,3 +1,4 @@
+@charset "UTF-8";
 .bold {
   font-weight: 700;
 }
@@ -7,6 +8,7 @@
 }
 .card__header > h3 {
   font-size: 18px;
+  width: 70%;
 }
 .card__body {
   font-size: 12px;
@@ -51,16 +53,31 @@
 }
 
 .tag {
-  display: block;
+  display: flex;
   margin-left: 5rem;
-  width: 80%;
+  justify-content: space-between;
+  width: 50%;
 }
 .tag__ingredient {
   display: block;
 }
+.tag__ingredient--bgColor {
+  background-color: #3282F7;
+}
+.tag__appliance {
+  display: block;
+}
+.tag__appliance--bgColor {
+  background-color: #68D9A4;
+}
+.tag__ustensil {
+  display: block;
+}
+.tag__ustensil--bgColor {
+  background-color: #ED6454;
+}
 .tag__search {
   max-width: 100%;
-  background-color: #3282F7;
   border: unset;
   outline: unset;
   border-radius: 5px 5px 5px 5px;
@@ -197,6 +214,33 @@
 }
 .card__body__description {
   flex-basis: 50%;
+  overflow: hidden;
+  line-height: 1.3rem;
+  height: 6rem;
+  text-align: justify;
+}
+.card__body__description::before {
+  content: "";
+  float: left;
+  width: 5px;
+  height: 3rem;
+}
+.card__body__description::after {
+  content: "…";
+  float: right;
+  position: relative;
+  top: 2rem;
+  left: 100%;
+  width: 3em;
+  margin-left: -3em;
+  padding-right: 5px;
+  text-align: right;
+  background: linear-gradient(to right, #E7E7E7, #E7E7E7 50%);
+}
+.card__body__description > *:first-child {
+  float: right;
+  width: 100%;
+  margin-left: -5px;
 }
 
 /*# sourceMappingURL=style.css.map */

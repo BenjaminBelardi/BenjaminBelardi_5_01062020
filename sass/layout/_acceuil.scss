@@ -1,3 +1,9 @@
+$lineheight:18px;
+$height: $lineheight * 3;
+$ellipsiswidth: 3em !default;
+
+
+
 .header{
     width: 100%;
     height: 5rem;
@@ -66,6 +72,34 @@
         }
         &__description{
             flex-basis: 50%;
+            overflow: hidden;
+            line-height: 1.3rem;
+            height: 6rem;
+            text-align: justify;
+            &::before {
+                content:"";
+                float: left;
+                width: 5px; 
+                height: 3rem; 
+            }
+            &::after{
+                content: "\02026";
+                float: right; 
+                position: relative;
+                top: 2rem; 
+                left: 100%;
+                width: 3em; 
+                margin-left: -3em;
+                padding-right: 5px;
+                text-align: right;
+                background: linear-gradient(to right, $card-bg-color,$card-bg-color 50%)
+            }
+            &> *:first-child {
+                float: right;
+                width: 100%;
+                margin-left: -5px; 
+            }
         }
+        
     }
 }

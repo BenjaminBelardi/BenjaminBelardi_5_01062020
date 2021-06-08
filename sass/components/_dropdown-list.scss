@@ -1,14 +1,29 @@
 
 .tag{
-    display: block;
+    display: flex;
     margin-left: 5rem;
-    width: 80%;
+    justify-content: space-between;
+    width: 50%;
     &__ingredient{
-        display: block
+        display: block;
+        &--bgColor{
+            background-color: $tag-ingredient-color;
+        }
+    }
+    &__appliance{
+        display: block;
+        &--bgColor{
+            background-color: $tag-appliance-color;
+        }
+    }
+    &__ustensil{
+        display: block;
+        &--bgColor{
+            background-color: $tag-utensil-color;
+        }
     }
     &__search{
         max-width: 100%;
-        background-color: $tag-ingredient-color;
         border: unset;
         outline: unset;
         border-radius: 5px 5px 5px 5px;
