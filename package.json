@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "OPC P5 Les petits plats",
   "main": "index.js",
+  "type" : "module",
   "scripts": {
     "sass": "sass --watch ./sass/main.scss:./public/css/style.css"
   },
@@ -15,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/BenjaminBelardi/P5-Les-Petits-Plats-Dev/issues"
   },
-  "homepage": "https://github.com/BenjaminBelardi/P5-Les-Petits-Plats-Dev#readme"
+  "homepage": "https://github.com/BenjaminBelardi/P5-Les-Petits-Plats-Dev#readme",
+  "dependencies": {
+  "node": "^15.14.0"
+  }
 }

@@ -81,7 +81,8 @@ recipes.forEach(element => {
     element.ingredients.forEach(element => {
         let str ="";
         ingredientFilter._addFilter(element.ingredient)
-        allProductIngredients.push([element.ingredient + ": " , (typeof element.quantity === "number" && typeof element.unit === "string") ? str.concat(element.quantity ,element.unit.substring(0,2)):(typeof element.quantity === "number")? element.quantity: ""])
+        allProductIngredients.push([element.ingredient + ": " ,
+         (typeof element.quantity === "number" && typeof element.unit === "string") ? str.concat(element.quantity ,element.unit.substring(0,2)):(typeof element.quantity === "number")? element.quantity: ""]);
     })
     element.ustensils.forEach(element => {
         ustensilsFilter._addFilter(element)
@@ -229,6 +230,7 @@ function getDataTag(event) {
 }
 //********************* cards creation ****************************************
 let results = allProducts;
+console.table(results);
 // litéral template for automatic cards creation
 const cardTemplate =`
     ${results.map(result =>`
@@ -252,7 +254,7 @@ const cardTemplate =`
             </div>
         </a>
     </div>
-    `)
+    `).join("")
 }`;
 let myRecipesList = document.getElementById("recipesList");
 myRecipesList.innerHTML = cardTemplate;

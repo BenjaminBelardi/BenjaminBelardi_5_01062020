@@ -2,70 +2,68 @@
 .tag{
     display: flex;
     margin-left: 5rem;
-    justify-content: space-between;
-    width: 50%;
-    &__ingredient{
-        display: block;
-        &--bgColor{
-            background-color: $tag-ingredient-color;
-        }
+    justify-content: flex-start;
+    &--size{
+        margin-right: 1rem;
     }
-    &__appliance{
-        display: block;
-        &--bgColor{
+    &__ingredients--color{
+        background-color: $tag-ingredient-color;
+        border-radius: 5px 5px 5px 5px;
+    }
+    &__appliances--color{
             background-color: $tag-appliance-color;
-        }
+            border-radius: 5px 5px 5px 5px;
     }
-    &__ustensil{
-        display: block;
-        &--bgColor{
+    &__ustensils--color{
             background-color: $tag-utensil-color;
-        }
+            border-radius: 5px 5px 5px 5px;
     }
     &__search{
         max-width: 100%;
         border: unset;
         outline: unset;
-        border-radius: 5px 5px 5px 5px;
         height: 3rem;
         padding-left: 1rem;
         color: white;
     }
-    &__list{
-         display :none;
-    }
+    // &__list{
+    //      display :none;
+    // }
     &__icon-up{
          display: none;
+         & fa{
+             color:white;
+         }
     }
     &__icon-down{
-        margin-left: -1.5rem;
-   }
-
+        display: flex;
+        align-items: center;
+        margin-right: 10px;
+    }
 }
 
- .displayIcon{
+.displayIcon{
     display: inline-block;
     margin-left: -1.5rem;
  }
- .hidden{
+.hidden{
      display: none;
  }
 
 .displayedList{
             display :flex;
-            position:absolute;
-            z-index: 1;
             flex-direction: column;
             flex-wrap: wrap;
             justify-content: space-between;
             max-width: 667px;
             max-height: 1900px;
-            width: 100%;
-            background-color:$tag-ingredient-color;
+            width: 667px;
+            /*background-color:$tag-ingredient-color;*/
             opacity: 1;
             padding: 10px;
             border-radius: 0 0 5px 5px;
             list-style: none;
+            margin-top: -5px;
             cursor:pointer;
         }
 .tag__filter{
@@ -81,13 +79,16 @@
 }
 
 .filterActive{
-    display: inline-block;
-    background-color:$tag-ingredient-color;
+    display: block;
+    /*background-color:$tag-ingredient-color;*/
     padding: .7rem 1.25rem;
     border-radius: 5px;
-    margin: auto 5px 5px auto;
+    margin: auto 5px 5px 0;
     color: white;
     & i{
         margin-left: 1rem;
     }
+}
+.fa-chevron-down{
+    color:white;
 }
