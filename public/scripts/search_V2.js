@@ -81,11 +81,39 @@ function UnCheckApplianceOnAllProduct(ApplianceName) {
 }
 
 function logAllProductWithTag(){
+    // purge the displayedProduct table before update with the new selection content
     displayedProduct = [];
     allProducts.forEach(oneProduct => {
         oneProduct._isConcernedByFilter()
     })
 }
+
+function RemoveTag(event){ 
+    let attr = event.target.getAttribute("filtertype");
+    let tagName = event.target.innerText;
+    if (event.target.parentNode.nodeName === "SPAN"){
+        attr = event.target.parentNode.getAttribute("filtertype");
+        tagName = event.target.parentNode.innerText;
+        event.target.parentNode.remove();
+    }else{
+        attr = event.target.getAttribute("filtertype");
+        event.target.remove();
+    }
+
+    if (attr === "ingredients"){
+        UnCheckIngredientOnAllProduct(tagName);
+        
+    }else if(attr === "appliances"){
+        UnCheckApplianceOnAllProduct(tagName);
+    
+    }else if(attr === "ustensils"){
+        UnCheckUstensilOnAllProduct(tagName);
+    }
+        logAllProductWithTag();
+        updateAllDisplayedProduct();
+        
+}
+
 function addSelectedTag(selectedTag,filterName) {
     let tag = document.getElementById("tagList");
     // create new span element
@@ -94,21 +122,15 @@ function addSelectedTag(selectedTag,filterName) {
     filter.appendChild(document.createTextNode(selectedTag));
     // set inner text property of span and add filterActive class
     filter.classList.add("filterActive", "tag__" + filterName + "--color");
-    tag.insertBefore(filter, tag.lastChild);
+    filter.setAttribute("filterType" , filterName);
     //creat new icon close element
     let icon = document.createElement('i');
     icon.classList.add('far', 'fa-times-circle');
     filter.appendChild(icon);
+    tag.insertBefore(filter, tag.lastChild);
+    ///////test///////
+    filter.addEventListener('click',RemoveTag);
 }
-// eventlistenner qui permet de supprimer les tag "filtre" quand l'utilisteur clique dessus
-// document.getElementById('tagList').addEventListener('click',function(event){
-//     if (event.target.parentElement.nodeName === "SPAN"){
-//         event.target.parentElement.remove();
-//     }else{
-//         event.target.remove();
-//     }
-//     event.stopPropagation();
-// });
 
 
 class Filter {
@@ -117,7 +139,8 @@ class Filter {
         this.data = []
         this._createTagChoiseEvent()
         this._createTagListDisplayEvent()
-        this._createTagRemoveChoiseEvent()
+        this._searchTagEvent()
+        //this._RemoveTagEvent()
         //this._createTagListHiddenEvent()
     }
 
@@ -131,7 +154,7 @@ class Filter {
         }
     }
 
-    _displayFilterOnDom() {
+    _createFilterOnDom() {
         let sel = document.getElementById(this.name + "-list");
         this.data.sort().forEach(function (element) {
             // create new li element
@@ -143,6 +166,14 @@ class Filter {
             // add list to end of list (sel)
             sel.appendChild(list);
         })
+    }
+
+    _modifieFilterOnDom(data){
+        let list = document.getElementById(this.name + "-list");
+        while(list.firstChild){
+            list.removeChild(list.firstChild);
+        }
+        this._createFilterOnDom();
     }
     
     // methode qui recupère l'élément qui à été cliqué par l'utilisateur dans la liste de filtre l'ajoute sous forme de Tag
@@ -173,43 +204,28 @@ class Filter {
         });
     }
     _createTagListDisplayEvent(){
-        let that = this;
-        let listToDisplay = document.getElementById(that.name + "-list")
-        document.getElementById(that.name + "-search").addEventListener("click", function(event){
+        let listToDisplay = document.getElementById(this.name + "-list")
+        document.getElementById(this.name + "-search").addEventListener("click", function(event){
             event.stopPropagation();
             listToDisplay.classList.toggle("displayedList");
         });
     }
-    // eventlistenner qui permet de supprimer les tag "filtre" quand l'utilisteur clique dessus
-    _createTagRemoveChoiseEvent(){
-        document.getElementById('tagList').addEventListener('click',function(event){
-        if (event.target.parentElement.nodeName === "SPAN"){
-            let tagName = event.target.parentElement.innerText;
-            event.target.parentElement.remove();
-            UnCheckUstensilOnAllProduct(tagName);
-            logAllProductWithTag();
-            updateAllDisplayedProduct();
-        }else{
-            let tagName = event.target.innerText;
-            event.target.remove();
-            UnCheckUstensilOnAllProduct(tagName);
-            logAllProductWithTag();
-            updateAllDisplayedProduct();
-        }
-        event.stopPropagation();
-    });
+    
+    _searchTagEvent() {
+        document.getElementById(this.name + "-search").addEventListener("input", (event) => {
+            const list = document.querySelectorAll('.tag__filter');
+            let regEx = new RegExp("^(" + event.target.value + ")", 'i');
+            list.forEach((element) => {
+                if (element.innerText.match(regEx) || event.target.value === "") {
+                    element.style.display = 'list-item';
+                } else {
+                    element.style.display = 'none';
+                }
+            });
+        });
     }
-    // _createTagListHiddenEvent(){
-    //     let that = this;
-    //     let listToHidden = document.getElementById(that.name + "-list")
-    //     document.getElementById(that.name + "-search").addEventListener("focusout", function(event){
-    //         event.stopPropagation();
-    //         listToHidden.classList.remove("displayedList");
-    //     });
-    // }
-
 }
-
+    
 class Ingredient {
     constructor(name) {
         this.name = name
@@ -229,7 +245,6 @@ class Ustensil {
     }
 }
 
-
 class Product {
     constructor(name, ingredients, ustencils, appliances, description) {
         this.name = name
@@ -245,6 +260,8 @@ class Product {
         this.ingredients.forEach(oneIngredient => {
             if (oneIngredient.name === ingredientName) {
                 oneIngredient.isChecked = true;
+            }else{
+                oneIngredient.isChecked = false;
             }
         })
         console.log("Voici les ingrédients mis à jours sur le produit", this.name)
@@ -254,6 +271,8 @@ class Product {
         this.appliances.forEach(oneAppliance => {
             if (oneAppliance.name === applianceName) {
                 oneAppliance.isChecked = true
+            }else{
+                oneAppliance.isChecked = false
             }
         })
         console.log("Voici les appareils mis à jours sur le produit", this.name)
@@ -263,6 +282,8 @@ class Product {
         this.ustencils.forEach(oneUstencils => {
             if (oneUstencils.name === ustencilsName) {
                 oneUstencils.isChecked = true
+            }else{
+                oneUstencils.isChecked = false
             }
         })
         console.log("Voici les ingrédients mis à jours sur le produit", this.name)
@@ -297,7 +318,6 @@ class Product {
         console.table(this.ingredients)
     }
 
-
     _isConcernedByFilter() {
         let isDisplayableProduct = false
         this.ingredients.forEach(oneIngredient => {
@@ -315,7 +335,7 @@ class Product {
                 isDisplayableProduct = true
             }
          })
-        if (isDisplayableProduct && displayedProduct.includes(this) === false) {
+        if (isDisplayableProduct) {
             console.log("Le produit", this.name, "est un produit valable")
             displayedProduct.push(this)
         } else {
@@ -324,34 +344,6 @@ class Product {
         }
     }
 }
-
-// let products = [
-//     {
-//      name : "purée mousseline",
-//      ingredients : [
-//          "ail",
-//          "echalottes",
-//          "lait"
-//      ]
-//     },
-//     {
-//      name : "foie gras de canard",
-//      ingredients : [
-//          "canard",
-//          "beurre",
-//          "ail",
-//          "sel"
-//      ]
-//     },
-//     {
-//      name : "nouilles",
-//      ingredients : [
-//          "sel",
-//          "poivre",
-//          "crème"
-//      ]
-//     },
-// ]
 
 // creation du tableau de produit qui contiendra toutes les recettes.
 //création des 3 filtres qui contiendrons les objets associés "indredient" "ustensil" "appliance".
@@ -376,14 +368,11 @@ recipes.forEach(oneProduct => {
 });
 
 //on affiche les filtres à l'initialisation
-ingredientFilter._displayFilterOnDom();
-ustensiltFilter._displayFilterOnDom();
-applianceFilter._displayFilterOnDom();
+ingredientFilter._createFilterOnDom();
+ustensiltFilter._createFilterOnDom();
+applianceFilter._createFilterOnDom();
 
 
-
-// On part du principe que l'utilisateur a coché "ail"
-//let ingredientChecked = "Ail";
-//checkIngredientOnAllProduct(ingredientChecked);
+//No display product at start up (to be corrected)
 logAllProductWithTag();
 updateAllDisplayedProduct();
