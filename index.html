@@ -21,7 +21,7 @@
     </header>
     <section>
         <div class="search">
-            <input class="search__bar" type="search"  name="search-bar" placeholder="Rechercher un ingrédient, appareil, ustensiles ou une recette">
+            <input class="search__bar" type="search"  id="search-bar" placeholder="Rechercher un ingrédient, appareil, ustensiles ou une recette">
             <button class="search__btn" type="submit" class="search__btn">
                 <span class="search__icon">
                     <i class="fa fa-search"></i>
@@ -33,7 +33,7 @@
         </div>
         <div class="tag" id="filterTag">
             <div class="dropdown tag--size">
-                <div class="input-group tag__ingredients--color">
+                <div class="input-group tag__ingredients--color" id="ingredients">
                     <input class="col tag__search tag__ingredients--color" type="text" id="ingredients-search" placeholder="Ingredient">
                     <span class="tag__icon-down">
                     <i class="fa fa-chevron-down"></i>
@@ -47,7 +47,7 @@
             </div>
 
             <div class="dropdown tag--size">
-                <div class="input-group tag__appliances--color">
+                <div class="input-group tag__appliances--color" id="appliances">
                     <input class="col tag__search tag__appliances--color" type="text" id="appliances-search" placeholder="Appareil">
                      <span class="tag__icon-down">
                     <i class="fa fa-chevron-down"></i>
@@ -60,7 +60,7 @@
             </div>
 
             <div class="dropdown tag--size">
-                <div class="input-group tag__ustensils--color">
+                <div class="input-group tag__ustensils--color" id="ustensils">
                     <input class="col tag__search tag__ustensils--color" type="text" id="ustensils-search" placeholder="Ustensilles">
                     <span class="tag__icon-down">
                     <i class="fa fa-chevron-down"></i>
@@ -186,7 +186,7 @@
         </div>
     </section>
     <!-- <script type="module" src="./public/scripts/search.js"></script> -->
-    <script type="module" src="./public/scripts/search_V2.js"></script>
+    <script type="module" src="./public/scripts/common-filter-search.js"></script>
 </body>
 
 </html>

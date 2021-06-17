@@ -3,6 +3,7 @@ import {recipes} from "./recipes.js";
 // litéral template for automatic cards creation
 
 let displayedProduct = []
+let nbTagActive = 0;
 
 
 // mise à jour du DOM pour l'affichage des proguits
@@ -53,7 +54,10 @@ export function updateAllDisplayedProduct(){
 
 function checkFilterElementOnAllProduct (elementName , filterType){
     console.log("Le", elementName, "est coché")
-    allProducts.forEach(oneProduct => {
+    // allProducts.forEach(oneProduct => {
+    // oneProduct._checkFilterElement(elementName , filterType)
+    // })
+    displayedProduct.forEach(oneProduct => {
     oneProduct._checkFilterElement(elementName , filterType)
     })
 
@@ -66,8 +70,9 @@ function UnCheckFilterElement(elementName, type){
     })
 }
 
-function logAllProductWithTag(tagType){
+function logAllProductWithTag(tagType, nbFilterActive){
     // purge the displayedProduct table before update with the new selection content
+    console.log(nbFilterActive);
     displayedProduct = [];
     allProducts.forEach(oneProduct => {
         oneProduct._isConcernedByFilter(tagType)
@@ -78,6 +83,7 @@ function RemoveTag(event){
     let attr = this.getAttribute("filtertype");
     let tagName = this.innerText;
     this.remove();
+    nbTagActive -- ;
     UnCheckFilterElement(tagName, attr);
     logAllProductWithTag(attr);
     updateAllDisplayedProduct();
@@ -105,10 +111,13 @@ function addSelectedTag(selectedTag,filterName) {
 // function qui mets à jour la liste de filtre en fonction des produits qui sont afficées
 function updateAllFilter (){
     if (displayedProduct.length != 0){
+        // on vide la contenu de tout les filtres
         ingredientFilter.data = [];
+        ustensiltFilter.data = [];
+        applianceFilter.data = [];
         //on recupère les 3 filtres
         let filterLists = document.querySelectorAll(".dropdown ul");
-        //pour chaue filtre on suprime tous les elements
+        //pour chaue filtre on suprime tous les elements du DOM
         filterLists.forEach(filter => {
             if (filter.hasChildNodes){
                 while(filter.firstChild){
@@ -116,7 +125,7 @@ function updateAllFilter (){
                 }
             } 
         });
-        //reconstruit les listes de filtre.
+        //reconstruit les listes de filtre à partir des produits qui sont affichées sur le DOM.
         displayedProduct.forEach(oneProduct => {
                     oneProduct.ingredients.forEach(oneIngredient => {
                             if (oneIngredient.isChecked === false){
@@ -140,7 +149,6 @@ function updateAllFilter (){
         applianceFilter._createFilterOnDom()
     }
 }
-
 
 export class Filter {
     constructor(name) {
@@ -185,11 +193,12 @@ export class Filter {
         document.getElementById(idList).addEventListener("click", function(element){
             if (element.target.nodeName === "LI"){
                 let tagName = element.target.innerText;
-                    addSelectedTag(tagName,that.name);
-                    checkFilterElementOnAllProduct(tagName,that.name)
-                    logAllProductWithTag(that.name);
-                    updateAllDisplayedProduct();
-                    updateAllFilter();
+                nbTagActive ++;
+                addSelectedTag(tagName,that.name);
+                checkFilterElementOnAllProduct(tagName,that.name)
+                logAllProductWithTag(that.name, nbTagActive);
+                updateAllDisplayedProduct();
+                updateAllFilter();
             }
         });
     }
@@ -241,9 +250,7 @@ export class Ingredient {
         }else{
             return string
         }
-
     }
-
 }
 export class Appliance {
     constructor(name) {
@@ -266,24 +273,30 @@ export class Product {
         this.appliances = appliances
         this.description = description
         this.time = time
+        this.nbFilterActive = 0
         console.log("Initialisation du produit", name)
         console.log("Voici la liste des ingrédients :", ingredients)
     }
 
     _checkFilterElement(elementName, type){
+
         this[type].forEach(oneElement =>{
             if(oneElement.name == elementName){
                 oneElement.isChecked = true;
+                this.nbFilterActive ++;
             }
         });
-        console.log("Voici les ingrédients mis à jours sur le produit", this.name , "avec le nouvel algo") 
+        console.log("Voici les ingrédients mis à jours sur le produit", this.name , "avec le nouvel algo")
         console.table(this[type])
+        console.log("Voici le nombre de filtre Actif sur le produit", this.name , "avec le nouvel algo" , this.nbFilterActive)
+       
     }
     
     _UnCheckFilterElement (elementName, type){
         this[type].forEach(oneElement =>{
             if (oneElement.name == elementName){
                 oneElement.isChecked = false;
+                this.nbFilterActive --;
             }
         });
         console.log("Voici les ingrédients mis à jours sur le produit", this.name ,"avec le nouvel algo");
@@ -292,12 +305,16 @@ export class Product {
 
     _isConcernedByFilter(type) {
         let isDisplayableProduct = false;
-        this[type].forEach(oneElement => {
-            if (oneElement.isChecked){
-                isDisplayableProduct = true;
-            }
-        });
-
+        console.log("nombre de filtre avtif dans le produit", this.name , ":", this.nbFilterActive)
+        console.log("nombre de Tag actif sur le DOM :", nbTagActive)
+        // this[type].forEach(oneElement => {
+        //     if (oneElement.isChecked){
+        //         isDisplayableProduct = true;
+        //     }
+        // });
+        if (this.nbFilterActive ===  nbTagActive){
+            isDisplayableProduct = true
+        }
         if (isDisplayableProduct) {
             console.log("Le produit", this.name, "est un produit valable")
             displayedProduct.push(this)
