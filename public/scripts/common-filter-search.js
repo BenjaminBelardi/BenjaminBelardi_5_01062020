@@ -65,7 +65,7 @@ function checkFilterElementOnAllProduct (elementName , filterType){
 
 function UnCheckFilterElement(elementName, type){
     console.log("Le", elementName, "est coché")
-    allProducts.forEach(oneProduct => {
+    displayedProduct.forEach(oneProduct => {
     oneProduct._UnCheckFilterElement(elementName, type)
     })
 }
@@ -214,7 +214,7 @@ export class Filter {
     _searchTagEvent() {
         document.getElementById(this.name + "-search").addEventListener("input", (event) => {
             const list = document.querySelectorAll('.tag__filter');
-            let regEx = new RegExp("^(" + event.target.value + ")", 'i');
+            let regEx = new RegExp("(" + event.target.value + ")", 'gi');
             list.forEach((element) => {
                 if (element.innerText.match(regEx) || event.target.value === "") {
                     element.style.display = 'list-item';
@@ -315,11 +315,17 @@ export class Product {
         if (this.nbFilterActive ===  nbTagActive){
             isDisplayableProduct = true
         }
-        if (isDisplayableProduct) {
-            console.log("Le produit", this.name, "est un produit valable")
+        if (isDisplayableProduct){
             displayedProduct.push(this)
+            console.log("Tag Search : Le produit", this.name, "est un produit valable")
         }
     }
+
+    _isConcernedByMainSearch(){
+         displayedProduct.push(this)
+         console.log("Main Search : Le produit", this.name, "est un produit valable")
+    }
+
 }
 
 //********************************INIT********************************************************/
@@ -359,9 +365,22 @@ document.getElementById('search-bar')
     .addEventListener("input", (event) => {
         if (event.target.value.length > 2){
             console.log ("main search start")
-            let regEx = new RegExp("^(" + event.target.value + ")", 'i');
-            allProducts.forEach(oneProduct => {
-                oneProduct.description.match(regEx)
-            });
+            let displayableProduct = [];
+            let regEx = new RegExp("(" + event.target.value + ")", 'gi');
+            console.log("RegEx :", regEx)
+             displayedProduct.forEach(oneProduct => {
+                 if(regEx.test(oneProduct.name) || regEx.test(oneProduct.description)){
+                     //alert("l'expression: " + regEx +" a été trouvé dans le produit" + oneProduct.name )
+                     //oneProduct._isConcernedByMainSearch();
+                     displayableProduct.push(oneProduct);
+                 }
+             });
+            displayedProduct = displayableProduct;
+            updateAllDisplayedProduct();
+            updateAllFilter();
+         }else{
+             displayedProduct = allProducts;
+             updateAllDisplayedProduct();
+             updateAllFilter();
         }
     });
