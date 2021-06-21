@@ -476,6 +476,7 @@ document.getElementById('search-bar')
 
     
     function mainSearch (type, mainSearchString){
+        console.time('MainSearch')
         let mainSearchLength = mainSearchString.length
         if (mainSearchLength > 2){
             console.log ("main search start")
@@ -487,6 +488,7 @@ document.getElementById('search-bar')
             udateResultNumber(displayedProduct.length);
             updateAllDisplayedProduct();
             updateAllFilter();
+            console.timeEnd('MainSearch')
           }else if (mainSearchLength === 0){
               if(nbTagActive ===0){
                 displayedProduct = allProducts;
@@ -495,11 +497,14 @@ document.getElementById('search-bar')
                 udateResultNumber(displayedProduct.length);
                 updateAllDisplayedProduct();
                 updateAllFilter();
+                console.timeEnd('MainSearch')
             }else{
                 logAllProductWithTag(type, mainSearchLength);
                 udateResultNumber(displayedProduct.length);
                 updateAllDisplayedProduct();
                 updateAllFilter();
+                console.timeEnd('MainSearch')
             }
           }
     }
+
