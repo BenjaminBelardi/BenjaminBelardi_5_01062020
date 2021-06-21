@@ -64,19 +64,39 @@ function checkFilterElementOnAllProduct (elementName , filterType){
 }
 
 function UnCheckFilterElement(elementName, type){
-    console.log("Le", elementName, "est coché")
+    console.log("Le", elementName, "est décoché")
     displayedProduct.forEach(oneProduct => {
     oneProduct._UnCheckFilterElement(elementName, type)
     })
 }
 
+function checkProductOnAllProduct (regEx){
+    allProducts.forEach(oneProduct => {
+    oneProduct._checkProduct(regEx);
+    })
+}
+
+function unCheckProductOnAllProduct (){
+    displayedProduct.forEach(oneProduct => {
+    oneProduct._unCheckProduct();
+    })
+}
+    
+
 function logAllProductWithTag(tagType, nbFilterActive){
     // purge the displayedProduct table before update with the new selection content
-    console.log(nbFilterActive);
+    console.log(nbTagActive);
+    let tempProduct = displayedProduct
     displayedProduct = [];
-    allProducts.forEach(oneProduct => {
+    if (nbTagActive >0){
+    tempProduct.forEach(oneProduct => {
         oneProduct._isConcernedByFilter(tagType)
-    })
+    });
+    }else{
+        allProducts.forEach(oneProduct => {
+            oneProduct._isConcernedByFilter(tagType)
+    });
+    }
 }
 
 function RemoveTag(event){ 
@@ -85,9 +105,10 @@ function RemoveTag(event){
     this.remove();
     nbTagActive -- ;
     UnCheckFilterElement(tagName, attr);
-    logAllProductWithTag(attr);
-    updateAllDisplayedProduct();
-    updateAllFilter ()   
+    mainSearch (event.type, mainSearchString)
+    //logAllProductWithTag(attr);
+    //updateAllDisplayedProduct();
+    //updateAllFilter ()   
 }
 
 function addSelectedTag(selectedTag,filterName) {
@@ -148,6 +169,16 @@ function updateAllFilter (){
         ustensiltFilter._createFilterOnDom();
         applianceFilter._createFilterOnDom()
     }
+}
+
+function udateResultNumber (number){
+    let test = document.getElementById("resultsNumbers")
+    if (test.childNodes.length > 1){
+        test.childNodes[1].replaceWith( number)
+    }else{
+        test.insertAdjacentText('beforeend', number);
+    }
+
 }
 
 export class Filter {
@@ -274,6 +305,8 @@ export class Product {
         this.description = description
         this.time = time
         this.nbFilterActive = 0
+        // Test check with main research
+        this.isChecked = false
         console.log("Initialisation du produit", name)
         console.log("Voici la liste des ingrédients :", ingredients)
     }
@@ -291,7 +324,6 @@ export class Product {
         console.log("Voici le nombre de filtre Actif sur le produit", this.name , "avec le nouvel algo" , this.nbFilterActive)
        
     }
-    
     _UnCheckFilterElement (elementName, type){
         this[type].forEach(oneElement =>{
             if (oneElement.name == elementName){
@@ -302,29 +334,101 @@ export class Product {
         console.log("Voici les ingrédients mis à jours sur le produit", this.name ,"avec le nouvel algo");
         console.table(this[type]);
     }
+/////////////////////test main search////////////////////
+    _checkProduct(regEx){
+        let ingredientFound = false
+        this.ingredients.forEach(oneIngredient => {
+            if (regEx.test(oneIngredient)){
+                ingredientFound = true;
+            }
+        });
+
+        if(regEx.test(this.name) || regEx.test(this.description) || ingredientFound){
+            console.log("le produit", this.name ,"est valable");
+            this.isChecked = true;
+        }else{
+            this.isChecked = false;
+        }
+    }
+    _unCheckProduct(){
+        this.isChecked = false;
+    }
+///////////////////////////////////////////////////////////
 
     _isConcernedByFilter(type) {
-        let isDisplayableProduct = false;
+        //let isDisplayableProduct = false;
         console.log("nombre de filtre avtif dans le produit", this.name , ":", this.nbFilterActive)
         console.log("nombre de Tag actif sur le DOM :", nbTagActive)
-        // this[type].forEach(oneElement => {
+        //this[type].forEach(oneElement => {
         //     if (oneElement.isChecked){
         //         isDisplayableProduct = true;
         //     }
-        // });
-        if (this.nbFilterActive ===  nbTagActive){
-            isDisplayableProduct = true
-        }
-        if (isDisplayableProduct){
-            displayedProduct.push(this)
-            console.log("Tag Search : Le produit", this.name, "est un produit valable")
-        }
+        //});
+
+
+
+        //
+        let mainSearchLength = document.getElementById("search-bar").value.length
+            if (nbTagActive > 0){
+                if (mainSearchLength > 2){
+                    if ((this.nbFilterActive ===  nbTagActive) && this.isChecked){
+                        displayedProduct.push(this)
+                        console.log("Tag Search : Le produit", this.name, "est un produit valable")
+                    }
+                }else if (this.nbFilterActive ===  nbTagActive) {
+                    displayedProduct.push(this)
+                    console.log("Tag Search : Le produit", this.name, "est un produit valable")
+                    }
+            }else if (this.isChecked){
+                displayedProduct.push(this)
+                console.log("Main Search : Le produit", this.name, "est un produit valable")
+            }
+        
+
+
+
+        // if (this.isChecked){
+        //     if (nbTagActive === 0){
+        //         displayedProduct.push(this)
+        //         console.log("Main Search : Le produit", this.name, "est un produit valable")
+        //     }else if (this.nbFilterActive ===  nbTagActive){
+        //         displayedProduct.push(this)
+        //         console.log("Main Search + Filter : Le produit", this.name, "est un produit valable")
+        //     }
+        // }
+
+
+
+
+
+        // if (nbTagActive > 0){
+        //     if (((this.nbFilterActive ===  nbTagActive) && this.isChecked == true){
+
+        //         displayedProduct.push(this)
+        //         console.log("Tag Search : Le produit", this.name, "est un produit valable")
+        //     }
+        // }else if (this.isChecked){
+        //     displayedProduct.push(this)
+        //         console.log("Tag Search : Le produit", this.name, "est un produit valable")
+        // }
+        
+
+
+        // if ((this.nbFilterActive ===  nbTagActive) && this.isChecked){
+        //     //isDisplayableProduct = true
+        //     displayedProduct.push(this)
+        //     console.log("Tag Search : Le produit", this.name, "est un produit valable")
+        // }
+        // if (isDisplayableProduct){
+        //     displayedProduct.push(this)
+        //     console.log("Tag Search : Le produit", this.name, "est un produit valable")
+        // }
     }
 
-    _isConcernedByMainSearch(){
-         displayedProduct.push(this)
-         console.log("Main Search : Le produit", this.name, "est un produit valable")
-    }
+    // _isConcernedByMainSearch(){
+    //      displayedProduct.push(this)
+    //      console.log("Main Search : Le produit", this.name, "est un produit valable")
+    // }
 
 }
 
@@ -358,29 +462,44 @@ applianceFilter._createFilterOnDom();
 
 // init display all products
 displayedProduct = allProducts;
+udateResultNumber(displayedProduct.length);
 updateAllDisplayedProduct();
 
 //*****************************************MAIN RESEARCH******************************** */
+let mainSearchString = ""
 document.getElementById('search-bar')
     .addEventListener("input", (event) => {
-        if (event.target.value.length > 2){
+        let type = event.target.id;
+        mainSearchString = event.target.value;
+        mainSearch(type, mainSearchString)
+    });
+
+    
+    function mainSearch (type, mainSearchString){
+        let mainSearchLength = mainSearchString.length
+        if (mainSearchLength > 2){
             console.log ("main search start")
-            let displayableProduct = [];
-            let regEx = new RegExp("(" + event.target.value + ")", 'gi');
+            //let regEx = new RegExp("(" + event.target.value + ")", 'gi');
+            let regEx = new RegExp("(" + mainSearchString + ")", 'gi');
             console.log("RegEx :", regEx)
-             displayedProduct.forEach(oneProduct => {
-                 if(regEx.test(oneProduct.name) || regEx.test(oneProduct.description)){
-                     //alert("l'expression: " + regEx +" a été trouvé dans le produit" + oneProduct.name )
-                     //oneProduct._isConcernedByMainSearch();
-                     displayableProduct.push(oneProduct);
-                 }
-             });
-            displayedProduct = displayableProduct;
+            checkProductOnAllProduct(regEx)
+            logAllProductWithTag(type,mainSearchLength);
+            udateResultNumber(displayedProduct.length);
             updateAllDisplayedProduct();
             updateAllFilter();
-         }else{
-             displayedProduct = allProducts;
-             updateAllDisplayedProduct();
-             updateAllFilter();
-        }
-    });
+          }else if (mainSearchLength === 0){
+              if(nbTagActive ===0){
+                displayedProduct = allProducts;
+                unCheckProductOnAllProduct();
+                //logAllProductWithTag(type, mainSearchLength);
+                udateResultNumber(displayedProduct.length);
+                updateAllDisplayedProduct();
+                updateAllFilter();
+            }else{
+                logAllProductWithTag(type, mainSearchLength);
+                udateResultNumber(displayedProduct.length);
+                updateAllDisplayedProduct();
+                updateAllFilter();
+            }
+          }
+    }
