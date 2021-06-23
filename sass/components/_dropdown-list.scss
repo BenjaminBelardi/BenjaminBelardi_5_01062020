@@ -1,7 +1,10 @@
 
 .tag{
     display: flex;
-    margin-left: 5rem;
+    width: 85%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 1rem;
     justify-content: flex-start;
     &--size{
         margin-right: 1rem;
@@ -26,9 +29,6 @@
         padding-left: 1rem;
         color: white;
     }
-    // &__list{
-    //      display :none;
-    // }
     &__icon-up{
          display: none;
          & fa{
