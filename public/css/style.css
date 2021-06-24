@@ -102,6 +102,10 @@
   color: white;
 }
 
+input::placeholder {
+  color: white;
+}
+
 .displayIcon {
   display: inline-block;
   margin-left: -1.5rem;
