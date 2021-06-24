@@ -2,12 +2,12 @@
 import { recipes } from "./recipes.js";
 // litéral template for automatic cards creation
 
-let displayedProduct = []
+let displayedProduct = [];
 let nbTagActive = 0;
 
 // mise à jour du DOM pour l'affichage des proguits
 function updateAllDisplayedProduct() {
-    let idOfElement = "recipesList"
+    let idOfElement = "recipesList";
     //document.getElementById(idOfElement).classList.remove("displayed")
     //document.getElementById("loader").classList.add("displayed")
     // Ici on supprime tous les produits dans notre "idOfElement"
@@ -45,7 +45,7 @@ function updateAllDisplayedProduct() {
             `).join("")
             }`;
     } else {
-        resultTemplate = `<article> Aucune recette ne correspond à vootre critère... vous pouvez chercher "tarte aux pommes", "poisson", ect</article>`
+        resultTemplate = `<article> Aucune recette ne correspond à vootre critère... vous pouvez chercher "tarte aux pommes", "poisson", ect</article>`;
 
     }
     document.getElementById(idOfElement).innerHTML = resultTemplate;
@@ -180,6 +180,7 @@ function normalize(str) {
     return str.normalize('NFD').replace(/[\u0300-\u036f]/g, "").toUpperCase();
   }
 
+/** Class representing a filter */
 class Filter {
     constructor(name) {
         this.name = name;
@@ -232,9 +233,11 @@ class Filter {
 
     _createTagListDisplayEvent() {
         let listToDisplay = document.getElementById(this.name + "-list");
+        let iconToggle = document.querySelectorAll("#" + this.name + " .tag__icon");
         document.getElementById(this.name).addEventListener("click", function (event) {
             listToDisplay.classList.toggle("displayedList");
-            event.stopPropagation();
+            iconToggle.forEach(icon => { icon.classList.toggle("hidden");
+            });
         });
     }
 
@@ -254,6 +257,7 @@ class Filter {
     }
 }
 
+// class representing an ingredient
 class Ingredient {
     constructor(name, quantity, unit) {
         this.name = name;
@@ -280,19 +284,23 @@ class Ingredient {
         }
     }
 }
+
+/** class representing an appliance */
 class Appliance {
     constructor(name) {
         this.name = name;
         this.isChecked = false;
     }
 }
+
+/** class representing an ustensil */
 class Ustensil {
     constructor(name) {
         this.name = name;
         this.isChecked = false;
     }
 }
-
+/** class representing a product recipie */
 class Product {
     constructor(name, ingredients, ustensils, appliances, description, time) {
         this.name = name;
@@ -418,8 +426,10 @@ document.getElementById('search-bar')
         mainSearch(type, mainSearchString);
     });
 
+    let mainSearchStart = 0
+    let mainSearchEnd = 0
 function mainSearch(type, mainSearchInput) {
-    console.time('MainSearch')
+        mainSearchStart = performance.now();
     let normalizeMainSearchInput = normalize(mainSearchInput.trim());
     let mainSearchLength = normalizeMainSearchInput.length;
     if (mainSearchLength > 2) {
@@ -431,7 +441,6 @@ function mainSearch(type, mainSearchInput) {
         udateResultNumber(displayedProduct.length);
         updateAllDisplayedProduct();
         updateAllFilter();
-        console.timeEnd('MainSearch');
     } else if (mainSearchLength === 0) {
         if (nbTagActive === 0) {
             displayedProduct = allProducts;
@@ -439,14 +448,15 @@ function mainSearch(type, mainSearchInput) {
             udateResultNumber(displayedProduct.length);
             updateAllDisplayedProduct();
             updateAllFilter();
-            console.timeEnd('MainSearch');
         } else {
             logAllProductWithTag(type, mainSearchLength);
             udateResultNumber(displayedProduct.length);
             updateAllDisplayedProduct();
             updateAllFilter();
-            console.timeEnd('MainSearch');
+            
         }
     }
+    mainSearchEnd = performance.now();
+    console.log ("Main Search V1 Time: " + (mainSearchEnd - mainSearchStart) + 'ms' )
 }
 

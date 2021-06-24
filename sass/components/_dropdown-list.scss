@@ -6,8 +6,14 @@
     margin-right: auto;
     margin-bottom: 1rem;
     justify-content: flex-start;
+    @media (max-width: 600px) {
+        flex-direction: column;
+    }
     &--size{
         margin-right: 1rem;
+        @media (max-width: 600px) {
+            margin-right: 0;
+        }
     }
     &__ingredients--color{
         background-color: $tag-ingredient-color;
@@ -29,16 +35,19 @@
         padding-left: 1rem;
         color: white;
     }
-    &__icon-up{
-         display: none;
-         & fa{
-             color:white;
-         }
-    }
-    &__icon-down{
+    // &__icon-up{
+    //      display: none;
+    //      & fa{
+    //          color:white;
+    //      }
+    // }
+    &__icon{
         display: flex;
         align-items: center;
         margin-right: 10px;
+        & .fa{
+            color:white;
+            }
     }
 }
 
@@ -51,26 +60,29 @@
  }
 
 .displayedList{
-            display :flex;
-            flex-direction: column;
-            flex-wrap: wrap;
-            justify-content: space-between;
+            display :grid;
+            grid-template-columns: auto auto auto;
             max-width: 667px;
-            max-height: 1900px;
             width: 667px;
-            /*background-color:$tag-ingredient-color;*/
             opacity: 1;
             padding: 10px;
             border-radius: 0 0 5px 5px;
             list-style: none;
             margin-top: -5px;
             cursor:pointer;
+            @media (max-width: 600px) {
+                max-width: none;
+                width: 100%;
+            }
         }
 .tag__filter{
     padding: 10px;
     color: white;
     &:hover{
         background-color:lighten($tag-ingredient-color, $amount: 10);
+    }
+    @media (max-width: 600px) {
+        font-size: .9rem;
     }
 }
 
@@ -87,6 +99,9 @@
     color: white;
     & i{
         margin-left: 1rem;
+    }
+    @media (max-width: 600px) {
+        width: fit-content;
     }
 }
 .fa-chevron-down{
