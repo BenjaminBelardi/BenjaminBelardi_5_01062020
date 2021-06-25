@@ -8,15 +8,7 @@ let nbTagActive = 0;
 // mise à jour du DOM pour l'affichage des proguits
 function updateAllDisplayedProduct() {
     let idOfElement = "recipesList";
-    //document.getElementById(idOfElement).classList.remove("displayed")
-    //document.getElementById("loader").classList.add("displayed")
-    // Ici on supprime tous les produits dans notre "idOfElement"
     document.getElementById(idOfElement).textContent = "";
-    //displayedProduct.forEach(oneProductToDisplay => {
-    //    document.getElementById(idOfElement).appendChild("<div>" + oneProductToDisplay.name +"</div>")
-    //})
-    //document.getElementById(idOfElement).classList.add("displayed")
-    //document.getElementById("loader").classList.remove("displayed")
     let resultTemplate;
     if (displayedProduct.length > 0) {
         resultTemplate = `
@@ -51,50 +43,45 @@ function updateAllDisplayedProduct() {
     document.getElementById(idOfElement).innerHTML = resultTemplate;
 }
 
-function checkFilterElementOnAllProduct(elementName, filterType) {
-    console.log("Le", elementName, "est coché");
-    // allProducts.forEach(oneProduct => {
-    // oneProduct._checkFilterElement(elementName , filterType)
-    // })
-    displayedProduct.forEach(oneProduct => {
-        oneProduct._checkFilterElement(elementName, filterType);
-    })
+function defaultProductDisplay (){
+    displayedProduct = allProducts;
+    unCheckProductOnAllProduct();
+    udateResultNumber(displayedProduct.length);
+    updateAllDisplayedProduct()
+    updateAllFilter();
+}
 
+function checkFilterElementOnAllProduct(elementName, filterType) {
+    displayedProduct.forEach(oneProduct => {
+    oneProduct._checkFilterElement(elementName , filterType)
+     });
 }
 
 function UnCheckFilterElement(elementName, type) {
-    console.log("Le", elementName, "est décoché");
-    displayedProduct.forEach(oneProduct => {
+    allProducts.forEach(oneProduct => {
         oneProduct._UnCheckFilterElement(elementName, type);
     })
 }
 
 function checkProductOnAllProduct(regEx) {
-    displayedProduct.forEach(oneProduct => {
+    allProducts.forEach(oneProduct => {
         oneProduct._checkProduct(regEx);
     })
 }
 
 function unCheckProductOnAllProduct() {
-    displayedProduct.forEach(oneProduct => {
+    allProducts.forEach(oneProduct => {
         oneProduct._unCheckProduct();
     })
 }
 
-function logAllProductWithTag(tagType, nbFilterActive) {
+function logAllProductWithTag(tagType) {
     // purge the displayedProduct table before update with the new selection content
-    console.log(nbTagActive);
     let tempProduct = displayedProduct;
     displayedProduct = [];
-    if (nbTagActive > 0) {
-        tempProduct.forEach(oneProduct => {
-            oneProduct._isConcernedByFilter(tagType);
-        });
-    } else {
-        allProducts.forEach(oneProduct => {
-            oneProduct._isConcernedByFilter(tagType);
-        });
-    }
+    allProducts.forEach(oneProduct => {
+        oneProduct._isConcernedByFilter(tagType);
+    });
 }
 
 function RemoveTag(event) {
@@ -103,7 +90,7 @@ function RemoveTag(event) {
     this.remove();
     nbTagActive--;
     UnCheckFilterElement(tagName, attr);
-    mainSearch(event.type, mainSearchString);
+    mainSearch(event.type,normalizeMainSearchInput);
 }
 
 function addSelectedTag(selectedTag, filterName) {
@@ -223,7 +210,7 @@ class Filter {
                 nbTagActive++;
                 addSelectedTag(tagName, that.name);
                 checkFilterElementOnAllProduct(tagName, that.name);
-                logAllProductWithTag(that.name, nbTagActive);
+                logAllProductWithTag(that.name);
                 updateAllDisplayedProduct();
                 updateAllFilter();
                 udateResultNumber(displayedProduct.length);
@@ -310,25 +297,18 @@ class Product {
         this.description = description;
         this.time = time;
         this.nbFilterActive = 0;
-        // Test check with main research
         this.isChecked = false;
-        console.log("Initialisation du produit", name);
-        console.log("Voici la liste des ingrédients :", ingredients);
     }
 
     _checkFilterElement(elementName, type) {
-
         this[type].forEach(oneElement => {
             if (oneElement.name == elementName) {
                 oneElement.isChecked = true;
                 this.nbFilterActive++;
             }
         });
-        console.log("Voici les ingrédients mis à jours sur le produit", this.name, "avec le nouvel algo");
-        console.table(this[type]);
-        console.log("Voici le nombre de filtre Actif sur le produit", this.name, "avec le nouvel algo", this.nbFilterActive);
-
     }
+
     _UnCheckFilterElement(elementName, type) {
         this[type].forEach(oneElement => {
             if (oneElement.name == elementName) {
@@ -336,10 +316,8 @@ class Product {
                 this.nbFilterActive--;
             }
         });
-        console.log("Voici les ingrédients mis à jours sur le produit", this.name, "avec le nouvel algo");
-        console.table(this[type]);
     }
-    /////////////////////test main search////////////////////
+   
     _checkProduct(regEx) {
         let ingredientFound = false;
         this.ingredients.forEach(oneIngredient => {
@@ -348,39 +326,30 @@ class Product {
             }
         });
         if (regEx.test(normalize(this.name)) || regEx.test(normalize(this.description)) || ingredientFound) {
-            console.log("le produit", this.name, "est valable");
             this.isChecked = true;
         } else {
             this.isChecked = false;
         }
     }
+
     _unCheckProduct() {
         this.isChecked = false;
     }
-    ///////////////////////////////////////////////////////////
+   
     _isConcernedByFilter(type) {
-        //let isDisplayableProduct = false;
-        console.log("nombre de filtre avtif dans le produit", this.name, ":", this.nbFilterActive);
-        console.log("nombre de Tag actif sur le DOM :", nbTagActive);
-        //this[type].forEach(oneElement => {
-        //     if (oneElement.isChecked){
-        //         isDisplayableProduct = true;
-        //     }
-        //});
+        //console.log("nombre de filtre avtif dans le produit", this.name, ":", this.nbFilterActive);
+        //console.log("nombre de Tag actif sur le DOM :", nbTagActive);
         let mainSearchLength = document.getElementById("search-bar").value.length
         if (nbTagActive > 0) {
             if (mainSearchLength > 2) {
                 if ((this.nbFilterActive === nbTagActive) && this.isChecked) {
                     displayedProduct.push(this)
-                    console.log("Tag Search : Le produit", this.name, "est un produit valable");
                 }
             } else if (this.nbFilterActive === nbTagActive) {
                 displayedProduct.push(this);
-                console.log("Tag Search : Le produit", this.name, "est un produit valable");
             }
         } else if (this.isChecked) {
             displayedProduct.push(this);
-            console.log("Main Search : Le produit", this.name, "est un produit valable");
         }
 
     }
@@ -413,50 +382,38 @@ ustensiltFilter._createFilterOnDom();
 applianceFilter._createFilterOnDom();
 
 // init display all products
+console.log (JSON.stringify(allProducts));
 displayedProduct = allProducts;
 udateResultNumber(displayedProduct.length);
 updateAllDisplayedProduct();
 
 //*****************************************MAIN RESEARCH******************************** */
-let mainSearchString = ""
+let normalizeMainSearchInput ="";
 document.getElementById('search-bar')
     .addEventListener("input", (event) => {
         let type = event.target.id;
-        mainSearchString = event.target.value;
-        mainSearch(type, mainSearchString);
+        let mainSearchString = event.target.value.trim();
+        normalizeMainSearchInput = normalize(mainSearchString.trim());
+        if (normalizeMainSearchInput.length > 2){
+            mainSearch(type, normalizeMainSearchInput);
+        }else{
+            defaultProductDisplay ();
+        }
     });
 
-    let mainSearchStart = 0
-    let mainSearchEnd = 0
+let mainSearchStart = 0;
+let mainSearchEnd = 0;
+
 function mainSearch(type, mainSearchInput) {
-        mainSearchStart = performance.now();
-    let normalizeMainSearchInput = normalize(mainSearchInput.trim());
-    let mainSearchLength = normalizeMainSearchInput.length;
-    if (mainSearchLength > 2) {
-        console.log("main search start");
-        let regEx = new RegExp("(" + normalizeMainSearchInput + ")", 'gi');
-        console.log("RegEx :", regEx);
-        checkProductOnAllProduct(regEx);
-        logAllProductWithTag(type, mainSearchLength);
-        udateResultNumber(displayedProduct.length);
-        updateAllDisplayedProduct();
-        updateAllFilter();
-    } else if (mainSearchLength === 0) {
-        if (nbTagActive === 0) {
-            displayedProduct = allProducts;
-            unCheckProductOnAllProduct();
-            udateResultNumber(displayedProduct.length);
-            updateAllDisplayedProduct();
-            updateAllFilter();
-        } else {
-            logAllProductWithTag(type, mainSearchLength);
-            udateResultNumber(displayedProduct.length);
-            updateAllDisplayedProduct();
-            updateAllFilter();
-            
-        }
-    }
+    mainSearchStart = performance.now();
+    let mainSearchLength = mainSearchInput.length;
+    let regEx = new RegExp("(" + mainSearchInput + ")", 'gi');
+    checkProductOnAllProduct(regEx);
+    logAllProductWithTag(type, mainSearchLength);
+    udateResultNumber(displayedProduct.length);
+    updateAllDisplayedProduct();
     mainSearchEnd = performance.now();
+    updateAllFilter();
     console.log ("Main Search V1 Time: " + (mainSearchEnd - mainSearchStart) + 'ms' )
 }
 
