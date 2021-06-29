@@ -13,8 +13,8 @@ function updateAllDisplayedProduct() {
     if (displayedProduct.length > 0) {
         resultTemplate = `
         ${displayedProduct.map(result => `
-            <div class="card">
-                <a class="card__link--color" href="#" title="">
+            <div class="col-12 col-md-6 col-lg-4 mb-5">
+                <a class="card card__link--color" href="#" title="">
                     <div class="card__img">
                     </div>
                     <div class="card__txt">
@@ -29,7 +29,7 @@ function updateAllDisplayedProduct() {
                             ${result.ingredients.map(element => `
                                 <li><span class="bold">${element.name} : </span>${element.quantity} ${element.unit}</li>`).join("")}
                             </ul>
-                            <p class="card__body__description"><span> ${result.description}</span></p>
+                            <p class="card__body__description truncate-overflow"><span> ${result.description.trunc(165)}</span></p>
                         </div>
                     </div>
                 </a>
@@ -43,6 +43,11 @@ function updateAllDisplayedProduct() {
     document.getElementById(idOfElement).innerHTML = resultTemplate;
 }
 
+String.prototype.trunc = 
+    function (n){
+        return this.substr(0,n-1)+(this.length > n ? '&hellip;':'')
+    }
+
 function defaultProductDisplay (){
     displayedProduct = allProducts;
     unCheckProductOnAllProduct();
@@ -52,7 +57,7 @@ function defaultProductDisplay (){
 }
 
 function checkFilterElementOnAllProduct(elementName, filterType) {
-    displayedProduct.forEach(oneProduct => {
+    allProducts.forEach(oneProduct => {
     oneProduct._checkFilterElement(elementName , filterType)
      });
 }
@@ -210,10 +215,11 @@ class Filter {
                 nbTagActive++;
                 addSelectedTag(tagName, that.name);
                 checkFilterElementOnAllProduct(tagName, that.name);
-                logAllProductWithTag(that.name);
-                updateAllDisplayedProduct();
-                updateAllFilter();
-                udateResultNumber(displayedProduct.length);
+                secondarySearch ();
+                // logAllProductWithTag(that.name);
+                // updateAllDisplayedProduct();
+                // updateAllFilter();
+                // udateResultNumber(displayedProduct.length);
             }
         });
     }
@@ -311,7 +317,7 @@ class Product {
 
     _UnCheckFilterElement(elementName, type) {
         this[type].forEach(oneElement => {
-            if (oneElement.name == elementName) {
+            if (oneElement.name == elementName &&  oneElement.isChecked) {
                 oneElement.isChecked = false;
                 this.nbFilterActive--;
             }
@@ -382,7 +388,6 @@ ustensiltFilter._createFilterOnDom();
 applianceFilter._createFilterOnDom();
 
 // init display all products
-console.log (JSON.stringify(allProducts));
 displayedProduct = allProducts;
 udateResultNumber(displayedProduct.length);
 updateAllDisplayedProduct();
@@ -396,8 +401,15 @@ document.getElementById('search-bar')
         normalizeMainSearchInput = normalize(mainSearchString.trim());
         if (normalizeMainSearchInput.length > 2){
             mainSearch(type, normalizeMainSearchInput);
-        }else{
+        //}else if (nbTagActive > 0){
+         //   logAllProductWithTag(type);
+         //   udateResultNumber(displayedProduct.length);
+         //   updateAllDisplayedProduct();
+         //   updateAllFilter();
+        }else if (nbTagActive == 0) {
             defaultProductDisplay ();
+        }else{
+            secondarySearch ();
         }
     });
 
@@ -406,14 +418,20 @@ let mainSearchEnd = 0;
 
 function mainSearch(type, mainSearchInput) {
     mainSearchStart = performance.now();
-    let mainSearchLength = mainSearchInput.length;
     let regEx = new RegExp("(" + mainSearchInput + ")", 'gi');
     checkProductOnAllProduct(regEx);
-    logAllProductWithTag(type, mainSearchLength);
+    logAllProductWithTag(type);
     udateResultNumber(displayedProduct.length);
     updateAllDisplayedProduct();
     mainSearchEnd = performance.now();
     updateAllFilter();
     console.log ("Main Search V1 Time: " + (mainSearchEnd - mainSearchStart) + 'ms' )
+}
+
+function secondarySearch (){
+    logAllProductWithTag();
+    updateAllDisplayedProduct();
+    updateAllFilter();
+    udateResultNumber(displayedProduct.length);
 }
 

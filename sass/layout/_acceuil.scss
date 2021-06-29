@@ -1,6 +1,6 @@
-$lineheight:18px;
-$height: $lineheight * 3;
-$ellipsiswidth: 3em !default;
+$lineheight: 1.1rem;
+$max-height: $lineheight * 7;
+//$ellipsiswidth: 3em !default;
 
 
 
@@ -28,21 +28,23 @@ $ellipsiswidth: 3em !default;
     }
 }
 .card{
-    display: flex;
-    //height: 364px;
-    background-color: white;
-    border: none;
-    margin-top: 1.5rem;
-    margin-bottom: 1.5rem;
-    width: 380px;
-    & a{
-        text-decoration: none;
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-        height: 100%;
-        
-    }
+    // display: flex;
+    // //height: 364px;
+    // background-color: white;
+    // border: none;
+    // margin-top: 1.5rem;
+    // margin-bottom: 1.5rem;
+    // width: 380px;
+    // & a{
+    //     text-decoration: none;
+    //     display: flex;
+    //     flex-direction: column;
+    //     width: 100%;
+    //     height: 100%;
+    //     &:hover{
+    //         text-decoration: none
+    //     }
+    // }
     &__img{
         display: flex;
         height: 178px;
@@ -57,6 +59,8 @@ $ellipsiswidth: 3em !default;
         //padding: 20px;
         padding: 1rem 1rem 0 1rem;
         background-color:$card-bg-color;
+        border-bottom-left-radius: 5px;
+        border-bottom-right-radius: 5px;
     }
     &__header{
         display: flex;
@@ -75,22 +79,23 @@ $ellipsiswidth: 3em !default;
         &__description{
             flex-basis: 50%;
             overflow: hidden;
-            line-height: 1.3rem;
-            //height: 6rem;
-            text-align: justify;
+            line-height: $lineheight;
+            max-height: $max-height;
+            //text-align: justify;
             // &::before {
             //     content:"";
+            //     position: relative;
             //     float: left;
             //     width: 5px; 
             //     height: 3rem; 
             // }
             // &::after{
             //     content: "\02026";
-            //     float: right; 
+            //     float: left; 
             //     position: relative;
-            //     top: 2rem; 
-            //     left: 100%;
-            //     width: 3em; 
+            //     top: -3rem; 
+            //     left: 95%;
+            //     width: 3rem; 
             //     margin-left: -3em;
             //     padding-right: 5px;
             //     text-align: right;
@@ -105,3 +110,22 @@ $ellipsiswidth: 3em !default;
         
     }
 }
+
+// .truncate-overflow {
+//     max-height: $height;
+//     overflow: hidden;
+//     &::before {
+//         content: "...";
+//         position: absolute;
+//         bottom: 0;
+//         right: 0;
+//       }
+//     &::after {
+//         content: "";
+//         position: absolute;
+//         right: 0; /* note: not using bottom */
+//         width: 1rem;
+//         height: 1rem;
+//         background: white;
+//       }
+// }
