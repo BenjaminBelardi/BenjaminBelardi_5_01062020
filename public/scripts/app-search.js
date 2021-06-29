@@ -6,6 +6,42 @@ let displayedProduct = [];
 let nbTagActive = 0;
 
 // mise à jour du DOM pour l'affichage des proguits
+function updateAllDisplayedProductV2() {
+    let idOfElement = "recipesList";
+    document.getElementById(idOfElement).textContent = "";
+    let resultTemplate;
+    if (displayedProduct.length > 0) {
+        resultTemplate = `
+        ${displayedProduct.map(result => `
+            <div class="col-12 col-md-6 col-lg-4 mb-5">
+                <a class="card card__link--color" href="#" title="">
+                    <div class="card__img">
+                    </div>
+                    <div class="card__txt">
+                        <div class="card__header">
+                            <h3>${result.name}</h3>
+                            <span class="card__header__time bold">${result.time} min
+                                <i class="far fa-clock"></i>
+                            </span>
+                        </div>
+                        <div class="card__body">
+                            <ul class="card__body__list">
+                            ${result.ingredients.map(element => `
+                                <li><span class="bold">${element.ingredient} : </span>${element.quantity} ${element.unit}</li>`).join("")}
+                            </ul>
+                            <p class="card__body__description truncate-overflow"><span> ${result.description.trunc(165)}</span></p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            `).join("")
+            }`;
+    } else {
+        resultTemplate = `<article> Aucune recette ne correspond à vootre critère... vous pouvez chercher "tarte aux pommes", "poisson", ect</article>`;
+
+    }
+    document.getElementById(idOfElement).innerHTML = resultTemplate;
+}
 function updateAllDisplayedProduct() {
     let idOfElement = "recipesList";
     document.getElementById(idOfElement).textContent = "";
@@ -52,7 +88,7 @@ function defaultProductDisplay (){
     displayedProduct = allProducts;
     unCheckProductOnAllProduct();
     udateResultNumber(displayedProduct.length);
-    updateAllDisplayedProduct()
+    updateAllDisplayedProduct();
     updateAllFilter();
 }
 
@@ -83,7 +119,7 @@ function unCheckProductOnAllProduct() {
 function logAllProductWithTag(tagType) {
     // purge the displayedProduct table before update with the new selection content
     let tempProduct = displayedProduct;
-    displayedProduct = [];
+    //displayedProduct = [];
     allProducts.forEach(oneProduct => {
         oneProduct._isConcernedByFilter(tagType);
     });
@@ -150,6 +186,42 @@ function updateAllFilter() {
                     applianceFilter._addFilter(oneUstensil.name);
                 }
             });
+        });
+        // mise à jour du DOM
+        ingredientFilter._createFilterOnDom();
+        ustensiltFilter._createFilterOnDom();
+        applianceFilter._createFilterOnDom();
+    }
+}
+function updateAllFilterV2() {
+    if (displayedProduct.length != 0) {
+        // on vide la contenu de tout les filtres
+        ingredientFilter.data = [];
+        ustensiltFilter.data = [];
+        applianceFilter.data = [];
+        //on recupère les 3 filtres
+        let filterLists = document.querySelectorAll(".dropdown ul");
+        //pour chaue filtre on suprime tous les elements du DOM
+        filterLists.forEach(filter => {
+            if (filter.hasChildNodes) {
+                while (filter.firstChild) {
+                    filter.removeChild(filter.firstChild);
+                }
+            }
+        });
+        //reconstruit les listes de filtre à partir des produits qui sont affichées sur le DOM.
+        displayedProduct.forEach(oneProduct => {
+            oneProduct.ingredients.forEach(oneIngredient => {
+                if (oneIngredient.isChecked === false) {
+                    ingredientFilter._addFilter(oneIngredient.ingredient);
+                }
+            });
+            oneProduct.ustensils.forEach(oneUstensil => {
+                if (oneUstensil.isChecked === false) {
+                    ustensiltFilter._addFilter(oneUstensil.name);
+                }
+            });
+            applianceFilter._addFilter(oneProduct.appliance);
         });
         // mise à jour du DOM
         ingredientFilter._createFilterOnDom();
@@ -348,14 +420,15 @@ class Product {
         let mainSearchLength = document.getElementById("search-bar").value.length
         if (nbTagActive > 0) {
             if (mainSearchLength > 2) {
-                if ((this.nbFilterActive === nbTagActive) && this.isChecked) {
+                //if ((this.nbFilterActive === nbTagActive) && this.isChecked) {
+                if ((this.nbFilterActive === nbTagActive) && displayedProduct.includes != this) { 
                     displayedProduct.push(this)
                 }
             } else if (this.nbFilterActive === nbTagActive) {
                 displayedProduct.push(this);
             }
-        } else if (this.isChecked) {
-            displayedProduct.push(this);
+        // } else if (this.isChecked) {
+        //     displayedProduct.push(this);
         }
 
     }
@@ -417,19 +490,34 @@ let mainSearchStart = 0;
 let mainSearchEnd = 0;
 
 function mainSearch(type, mainSearchInput) {
+     // clear display product only for V2
+    displayedProduct = [];
     mainSearchStart = performance.now();
     let regEx = new RegExp("(" + mainSearchInput + ")", 'gi');
-    checkProductOnAllProduct(regEx);
+    recipes.forEach(oneProduct => {
+        if (regEx.test(oneProduct.name))   {
+            displayedProduct.push(oneProduct)
+        }else if (regEx.test(oneProduct.description)){
+            displayedProduct.push(oneProduct)
+        }else{
+            oneProduct.ingredients.forEach(oneIngredient => {
+                if (regEx.test(oneIngredient.ingredient)){
+                    displayedProduct.push(oneProduct)
+                } 
+            });
+        }
+    });
     logAllProductWithTag(type);
     udateResultNumber(displayedProduct.length);
-    updateAllDisplayedProduct();
+    updateAllDisplayedProductV2();
     mainSearchEnd = performance.now();
-    updateAllFilter();
+    updateAllFilterV2();
     console.log ("Main Search V1 Time: " + (mainSearchEnd - mainSearchStart) + 'ms' )
 }
 
 function secondarySearch (){
-    logAllProductWithTag();
+    displayedProduct = [];  // clear dsiplayed product only for V2
+    //logAllProductWithTag();
     updateAllDisplayedProduct();
     updateAllFilter();
     udateResultNumber(displayedProduct.length);
