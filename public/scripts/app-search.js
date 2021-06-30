@@ -42,97 +42,93 @@ function updateAllDisplayedProductV2() {
     }
     document.getElementById(idOfElement).innerHTML = resultTemplate;
 }
-function updateAllDisplayedProduct() {
-    let idOfElement = "recipesList";
-    document.getElementById(idOfElement).textContent = "";
-    let resultTemplate;
-    if (displayedProduct.length > 0) {
-        resultTemplate = `
-        ${displayedProduct.map(result => `
-            <div class="col-12 col-md-6 col-lg-4 mb-5">
-                <a class="card card__link--color" href="#" title="">
-                    <div class="card__img">
-                    </div>
-                    <div class="card__txt">
-                        <div class="card__header">
-                            <h3>${result.name}</h3>
-                            <span class="card__header__time bold">${result.time} min
-                                <i class="far fa-clock"></i>
-                            </span>
-                        </div>
-                        <div class="card__body">
-                            <ul class="card__body__list">
-                            ${result.ingredients.map(element => `
-                                <li><span class="bold">${element.name} : </span>${element.quantity} ${element.unit}</li>`).join("")}
-                            </ul>
-                            <p class="card__body__description truncate-overflow"><span> ${result.description.trunc(165)}</span></p>
-                        </div>
-                    </div>
-                </a>
-            </div>
-            `).join("")
-            }`;
-    } else {
-        resultTemplate = `<article> Aucune recette ne correspond à vootre critère... vous pouvez chercher "tarte aux pommes", "poisson", ect</article>`;
 
-    }
-    document.getElementById(idOfElement).innerHTML = resultTemplate;
-}
-
+//function qui permet de tronquer du texte et de rajouter ... à la fin
 String.prototype.trunc = 
     function (n){
         return this.substr(0,n-1)+(this.length > n ? '&hellip;':'')
     }
 
-function defaultProductDisplay (){
-    displayedProduct = allProducts;
-    unCheckProductOnAllProduct();
+// fonction qui permet de mettre à jour le DOM avec les recette trouvé et mets à jours tous les filtres
+function updateDom (products){
+    displayedProduct = products; 
+    updateAllDisplayedProductV2();
+    updateAllFilterV2();
     udateResultNumber(displayedProduct.length);
-    updateAllDisplayedProduct();
-    updateAllFilter();
 }
+
+
+function checkFilterElementOnDisplayedProduct(elementName, filterType) {
+    let tempDisplayProduct =[];
+    displayedProduct.forEach(oneProduct => {
+    if (filterType == "ingredients"){
+        oneProduct[filterType].forEach(ingredient => {
+            if (normalize(ingredient.ingredient) == normalize(elementName) ){
+                tempDisplayProduct.push(oneProduct);
+            }
+        });
+    }else if (filterType == "appliances"){
+        if ( oneProduct.appliance == elementName){
+            tempDisplayProduct.push(oneProduct);
+        }
+    }else if(filterType == "ustensils"){
+        oneProduct[filterType].forEach(ustensil =>{
+            if(ustensil == elementName){
+                tempDisplayProduct.push(oneProduct);
+            }
+        }) ;
+    }
+     });
+    return tempDisplayProduct;
+}
+
 
 function checkFilterElementOnAllProduct(elementName, filterType) {
-    allProducts.forEach(oneProduct => {
-    oneProduct._checkFilterElement(elementName , filterType)
+    let tempDisplayProduct =[];
+    recipes.forEach(oneProduct => {
+    if (filterType == "ingredients"){
+        oneProduct[filterType].forEach(ingredient => {
+            if (normalize(ingredient.ingredient) == normalize(elementName) ){
+                tempDisplayProduct.push(oneProduct);
+            }
+        });
+    }else if (filterType == "appliances"){
+        if ( oneProduct.appliance == elementName){
+            tempDisplayProduct.push(oneProduct);
+        }
+    }else if(filterType == "ustensils"){
+        oneProduct[filterType].forEach(ustensil =>{
+            if(ustensil == elementName){
+                tempDisplayProduct.push(oneProduct);
+            }
+        }) ;
+    }
      });
-}
-
-function UnCheckFilterElement(elementName, type) {
-    allProducts.forEach(oneProduct => {
-        oneProduct._UnCheckFilterElement(elementName, type);
-    })
-}
-
-function checkProductOnAllProduct(regEx) {
-    allProducts.forEach(oneProduct => {
-        oneProduct._checkProduct(regEx);
-    })
-}
-
-function unCheckProductOnAllProduct() {
-    allProducts.forEach(oneProduct => {
-        oneProduct._unCheckProduct();
-    })
-}
-
-function logAllProductWithTag(tagType) {
-    // purge the displayedProduct table before update with the new selection content
-    let tempProduct = displayedProduct;
-    //displayedProduct = [];
-    allProducts.forEach(oneProduct => {
-        oneProduct._isConcernedByFilter(tagType);
-    });
+    return tempDisplayProduct;
 }
 
 function RemoveTag(event) {
-    let attr = this.getAttribute("filtertype");
-    let tagName = this.innerText;
     this.remove();
     nbTagActive--;
-    UnCheckFilterElement(tagName, attr);
+    let productfound = [];
+    if (nbTagActive > 0){
+        let tagList = document.querySelectorAll(".filterActive");
+        tagList.forEach(tag => {
+            productfound.push(checkFilterElementOnAllProduct(tag.textContent, tag.getAttribute("filtertype")));
+        });
+        updateDom(arrayIntersection(productfound));
+    }else{
     mainSearch(event.type,normalizeMainSearchInput);
+    }
 }
+
+// fonction intersection de tableaux
+// pour chaque element (v) du tableau a on vérifié si ils sont présent dans le tableau "rest" et ont retourne les valeus communes au deux tableaux.
+function arrayIntersection (array){
+    let [array1,...rest] = array; //see def: rest parameter
+    return array1.filter(element => rest.every(val => val.includes(element)));
+}
+
 
 function addSelectedTag(selectedTag, filterName) {
     let tag = document.getElementById("tagList");
@@ -152,47 +148,7 @@ function addSelectedTag(selectedTag, filterName) {
     filter.addEventListener('click', RemoveTag);
 }
 
-// function qui mets à jour la liste de filtre en fonction des produits qui sont afficées
-function updateAllFilter() {
-    if (displayedProduct.length != 0) {
-        // on vide la contenu de tout les filtres
-        ingredientFilter.data = [];
-        ustensiltFilter.data = [];
-        applianceFilter.data = [];
-        //on recupère les 3 filtres
-        let filterLists = document.querySelectorAll(".dropdown ul");
-        //pour chaue filtre on suprime tous les elements du DOM
-        filterLists.forEach(filter => {
-            if (filter.hasChildNodes) {
-                while (filter.firstChild) {
-                    filter.removeChild(filter.firstChild);
-                }
-            }
-        });
-        //reconstruit les listes de filtre à partir des produits qui sont affichées sur le DOM.
-        displayedProduct.forEach(oneProduct => {
-            oneProduct.ingredients.forEach(oneIngredient => {
-                if (oneIngredient.isChecked === false) {
-                    ingredientFilter._addFilter(oneIngredient.name);
-                }
-            });
-            oneProduct.ustensils.forEach(oneUstensil => {
-                if (oneUstensil.isChecked === false) {
-                    ustensiltFilter._addFilter(oneUstensil.name);
-                }
-            });
-            oneProduct.appliances.forEach(oneUstensil => {
-                if (oneUstensil.isChecked === false) {
-                    applianceFilter._addFilter(oneUstensil.name);
-                }
-            });
-        });
-        // mise à jour du DOM
-        ingredientFilter._createFilterOnDom();
-        ustensiltFilter._createFilterOnDom();
-        applianceFilter._createFilterOnDom();
-    }
-}
+
 function updateAllFilterV2() {
     if (displayedProduct.length != 0) {
         // on vide la contenu de tout les filtres
@@ -212,14 +168,10 @@ function updateAllFilterV2() {
         //reconstruit les listes de filtre à partir des produits qui sont affichées sur le DOM.
         displayedProduct.forEach(oneProduct => {
             oneProduct.ingredients.forEach(oneIngredient => {
-                if (oneIngredient.isChecked === false) {
-                    ingredientFilter._addFilter(oneIngredient.ingredient);
-                }
+                ingredientFilter._addFilter(oneIngredient.ingredient);
             });
             oneProduct.ustensils.forEach(oneUstensil => {
-                if (oneUstensil.isChecked === false) {
-                    ustensiltFilter._addFilter(oneUstensil.name);
-                }
+                ustensiltFilter._addFilter(oneUstensil);
             });
             applianceFilter._addFilter(oneProduct.appliance);
         });
@@ -252,8 +204,6 @@ class Filter {
         this._createTagChoiseEvent();
         this._createTagListDisplayEvent();
         this._searchTagEvent();
-        //this._RemoveTagEvent()
-        //this._createTagListHiddenEvent()
     }
 
     _addFilter(newElement) {
@@ -286,12 +236,8 @@ class Filter {
                 let tagName = element.target.innerText;
                 nbTagActive++;
                 addSelectedTag(tagName, that.name);
-                checkFilterElementOnAllProduct(tagName, that.name);
-                secondarySearch ();
-                // logAllProductWithTag(that.name);
-                // updateAllDisplayedProduct();
-                // updateAllFilter();
-                // udateResultNumber(displayedProduct.length);
+                let productfound = checkFilterElementOnDisplayedProduct(tagName, that.name);
+                updateDom(productfound);
             }
         });
     }
@@ -322,138 +268,26 @@ class Filter {
     }
 }
 
-// class representing an ingredient
-class Ingredient {
-    constructor(name, quantity, unit) {
-        this.name = name;
-        this.quantity = this._validData(quantity);
-        this.unit = this._shortenUnit(unit);
-        this.isChecked = false;
-        this._shortenUnit();
-    }
-
-    _validData(data) {
-        if (typeof data === "undefined") {
-            return data = "";
-        } else {
-            return data;
-        }
-    }
-
-    _shortenUnit(data) {
-        let string = this._validData(data);
-        if (string.length > 2) {
-            return string.substring(2, 0);
-        } else {
-            return string;
-        }
-    }
-}
-
-/** class representing an appliance */
-class Appliance {
-    constructor(name) {
-        this.name = name;
-        this.isChecked = false;
-    }
-}
-
-/** class representing an ustensil */
-class Ustensil {
-    constructor(name) {
-        this.name = name;
-        this.isChecked = false;
-    }
-}
-/** class representing a product recipie */
-class Product {
-    constructor(name, ingredients, ustensils, appliances, description, time) {
-        this.name = name;
-        this.ingredients = ingredients;
-        this.ustensils = ustensils;
-        this.appliances = appliances;
-        this.description = description;
-        this.time = time;
-        this.nbFilterActive = 0;
-        this.isChecked = false;
-    }
-
-    _checkFilterElement(elementName, type) {
-        this[type].forEach(oneElement => {
-            if (oneElement.name == elementName) {
-                oneElement.isChecked = true;
-                this.nbFilterActive++;
-            }
-        });
-    }
-
-    _UnCheckFilterElement(elementName, type) {
-        this[type].forEach(oneElement => {
-            if (oneElement.name == elementName &&  oneElement.isChecked) {
-                oneElement.isChecked = false;
-                this.nbFilterActive--;
-            }
-        });
-    }
-   
-    _checkProduct(regEx) {
-        let ingredientFound = false;
-        this.ingredients.forEach(oneIngredient => {
-            if (regEx.test(normalize(oneIngredient.name))) {
-                ingredientFound = true;
-            }
-        });
-        if (regEx.test(normalize(this.name)) || regEx.test(normalize(this.description)) || ingredientFound) {
-            this.isChecked = true;
-        } else {
-            this.isChecked = false;
-        }
-    }
-
-    _unCheckProduct() {
-        this.isChecked = false;
-    }
-   
-    _isConcernedByFilter(type) {
-        //console.log("nombre de filtre avtif dans le produit", this.name, ":", this.nbFilterActive);
-        //console.log("nombre de Tag actif sur le DOM :", nbTagActive);
-        let mainSearchLength = document.getElementById("search-bar").value.length
-        if (nbTagActive > 0) {
-            if (mainSearchLength > 2) {
-                //if ((this.nbFilterActive === nbTagActive) && this.isChecked) {
-                if ((this.nbFilterActive === nbTagActive) && displayedProduct.includes != this) { 
-                    displayedProduct.push(this)
-                }
-            } else if (this.nbFilterActive === nbTagActive) {
-                displayedProduct.push(this);
-            }
-        // } else if (this.isChecked) {
-        //     displayedProduct.push(this);
-        }
-
-    }
-}
 //********************************INIT********************************************************/
 //création des 3 filtres qui contiendrons les objets associés "indredient" "ustensil" "appliance".
 let ingredientFilter = new Filter("ingredients");
 let applianceFilter = new Filter("appliances");
 let ustensiltFilter = new Filter("ustensils");
 // creation du tableau de produit qui contiendra toutes les recettes sous forme d'objet.
-let allProducts = [];
 
 recipes.forEach(oneProduct => {
-    let allIngredients = [], allUstensils = [], allAppliances = [];
+    //let allIngredients = [], allUstensils = [], allAppliances = [];
     oneProduct.ingredients.forEach(oneIngredient => {
-        allIngredients.push(new Ingredient(oneIngredient.ingredient, oneIngredient.quantity, oneIngredient.unit));
+        //allIngredients.push(new Ingredient(oneIngredient.ingredient, oneIngredient.quantity, oneIngredient.unit));
         ingredientFilter._addFilter(oneIngredient.ingredient);
     });
     oneProduct.ustensils.forEach(oneUstensil => {
-        allUstensils.push(new Ustensil(oneUstensil));
+        //allUstensils.push(new Ustensil(oneUstensil));
         ustensiltFilter._addFilter(oneUstensil);
     });
-    allAppliances.push(new Appliance(oneProduct.appliance));
+    //allAppliances.push(new Appliance(oneProduct.appliance));
     applianceFilter._addFilter(oneProduct.appliance);
-    allProducts.push(new Product(oneProduct.name, allIngredients, allUstensils, allAppliances, oneProduct.description, oneProduct.time));
+    //allProducts.push(new Product(oneProduct.name, allIngredients, allUstensils, allAppliances, oneProduct.description, oneProduct.time));
 });
 //on affiche les filtres à l'initialisation
 ingredientFilter._createFilterOnDom();
@@ -461,9 +295,9 @@ ustensiltFilter._createFilterOnDom();
 applianceFilter._createFilterOnDom();
 
 // init display all products
-displayedProduct = allProducts;
+displayedProduct = recipes;
 udateResultNumber(displayedProduct.length);
-updateAllDisplayedProduct();
+updateAllDisplayedProductV2();
 
 //*****************************************MAIN RESEARCH******************************** */
 let normalizeMainSearchInput ="";
@@ -474,15 +308,14 @@ document.getElementById('search-bar')
         normalizeMainSearchInput = normalize(mainSearchString.trim());
         if (normalizeMainSearchInput.length > 2){
             mainSearch(type, normalizeMainSearchInput);
-        //}else if (nbTagActive > 0){
-         //   logAllProductWithTag(type);
-         //   udateResultNumber(displayedProduct.length);
-         //   updateAllDisplayedProduct();
-         //   updateAllFilter();
         }else if (nbTagActive == 0) {
-            defaultProductDisplay ();
+            updateDom(recipes);
         }else{
-            secondarySearch ();
+            let tagList = document.querySelectorAll(".filterActive");
+            tagList.forEach(tag => {
+            let productfound = checkFilterElementOnAllProduct(tag.textContent, tag.getAttribute("filtertype"));
+            updateDom(productfound);
+            });
         }
     });
 
@@ -490,36 +323,41 @@ let mainSearchStart = 0;
 let mainSearchEnd = 0;
 
 function mainSearch(type, mainSearchInput) {
-     // clear display product only for V2
-    displayedProduct = [];
     mainSearchStart = performance.now();
     let regEx = new RegExp("(" + mainSearchInput + ")", 'gi');
-    recipes.forEach(oneProduct => {
-        if (regEx.test(oneProduct.name))   {
-            displayedProduct.push(oneProduct)
-        }else if (regEx.test(oneProduct.description)){
-            displayedProduct.push(oneProduct)
-        }else{
-            oneProduct.ingredients.forEach(oneIngredient => {
-                if (regEx.test(oneIngredient.ingredient)){
-                    displayedProduct.push(oneProduct)
-                } 
-            });
-        }
-    });
-    logAllProductWithTag(type);
-    udateResultNumber(displayedProduct.length);
-    updateAllDisplayedProductV2();
+    if (nbTagActive == 0){
+        displayedProduct = [];
+        recipes.forEach(oneProduct => {
+            if (regEx.test(normalize(oneProduct.name)))   {
+                displayedProduct.push(oneProduct);
+            }else if (regEx.test(normalize(oneProduct.description))){
+                displayedProduct.push(oneProduct);
+            }else{
+                oneProduct.ingredients.forEach(oneIngredient => {
+                    if (regEx.test(normalize(oneIngredient.ingredient))){
+                        displayedProduct.push(oneProduct);
+                    } 
+                });
+            }
+        });
+    }else{
+        let tempDisplayProduct = [];
+        displayedProduct.forEach(oneProduct => {
+            if (regEx.test(normalize(oneProduct.name)))   {
+                tempDisplayProduct.push(oneProduct);
+            }else if (regEx.test(normalize(oneProduct.description))){
+                tempDisplayProduct.push(oneProduct);
+            }else{
+                oneProduct.ingredients.forEach(oneIngredient => {
+                    if (regEx.test(normalize(oneIngredient.ingredient))){
+                        tempDisplayProduct.push(oneProduct);
+                    } 
+                });
+            }
+        });
+        displayedProduct = tempDisplayProduct;
+    }
+    updateDom(displayedProduct);
     mainSearchEnd = performance.now();
-    updateAllFilterV2();
-    console.log ("Main Search V1 Time: " + (mainSearchEnd - mainSearchStart) + 'ms' )
+    console.log ("Main Search V2 Time: " + (mainSearchEnd - mainSearchStart) + 'ms' );
 }
-
-function secondarySearch (){
-    displayedProduct = [];  // clear dsiplayed product only for V2
-    //logAllProductWithTag();
-    updateAllDisplayedProduct();
-    updateAllFilter();
-    udateResultNumber(displayedProduct.length);
-}
-
