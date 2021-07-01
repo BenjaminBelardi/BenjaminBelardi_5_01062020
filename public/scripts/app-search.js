@@ -5,7 +5,7 @@ import { recipes } from "./recipes.js";
 let displayedProduct = [];
 let nbTagActive = 0;
 
-// mise à jour du DOM pour l'affichage des proguits
+// update DOM to displayed product list
 function updateAllDisplayedProductV2() {
     let idOfElement = "recipesList";
     document.getElementById(idOfElement).textContent = "";
@@ -43,13 +43,13 @@ function updateAllDisplayedProductV2() {
     document.getElementById(idOfElement).innerHTML = resultTemplate;
 }
 
-//function qui permet de tronquer du texte et de rajouter ... à la fin
+// function to truncate text and to add "..." as a suffix
 String.prototype.trunc = 
     function (n){
         return this.substr(0,n-1)+(this.length > n ? '&hellip;':'')
     }
 
-// fonction qui permet de mettre à jour le DOM avec les recette trouvé et mets à jours tous les filtres
+// function to update DOM with the filtered recipes. Also update the filters
 function updateDom (products){
     displayedProduct = products; 
     updateAllDisplayedProductV2();
@@ -122,8 +122,10 @@ function RemoveTag(event) {
     }
 }
 
-// fonction intersection de tableaux
-// pour chaque element (v) du tableau a on vérifié si ils sont présent dans le tableau "rest" et ont retourne les valeus communes au deux tableaux.
+// function for table intersection
+// for each element (element) of the table array1:
+//   check if element is in "rest" table results 
+//   returns common values in both table a and rest
 function arrayIntersection (array){
     let [array1,...rest] = array; //see def: rest parameter
     return array1.filter(element => rest.every(val => val.includes(element)));
@@ -151,13 +153,12 @@ function addSelectedTag(selectedTag, filterName) {
 
 function updateAllFilterV2() {
     if (displayedProduct.length != 0) {
-        // on vide la contenu de tout les filtres
+        // clear the filter data
         ingredientFilter.data = [];
         ustensiltFilter.data = [];
         applianceFilter.data = [];
-        //on recupère les 3 filtres
         let filterLists = document.querySelectorAll(".dropdown ul");
-        //pour chaue filtre on suprime tous les elements du DOM
+        // for every filter all DOM element are cleared
         filterLists.forEach(filter => {
             if (filter.hasChildNodes) {
                 while (filter.firstChild) {
@@ -165,7 +166,7 @@ function updateAllFilterV2() {
                 }
             }
         });
-        //reconstruit les listes de filtre à partir des produits qui sont affichées sur le DOM.
+        // rebuild the filter list from the products displayed in the DOM
         displayedProduct.forEach(oneProduct => {
             oneProduct.ingredients.forEach(oneIngredient => {
                 ingredientFilter._addFilter(oneIngredient.ingredient);
@@ -175,7 +176,6 @@ function updateAllFilterV2() {
             });
             applianceFilter._addFilter(oneProduct.appliance);
         });
-        // mise à jour du DOM
         ingredientFilter._createFilterOnDom();
         ustensiltFilter._createFilterOnDom();
         applianceFilter._createFilterOnDom();
@@ -226,8 +226,10 @@ class Filter {
         })
     }
 
-    // methode qui recupère l'élément qui à été cliqué par l'utilisateur dans la liste de filtre l'ajoute sous forme de Tag
-    //mets à jour et affiche la liste des rectees qui contiennent ce tag.
+
+    // method to get the element clicked by user in the filter list
+    // add the element as a tag
+    // update and display of the list of recipes that contain the tag in the DOM
     _createTagChoiseEvent() {
         let that = this;
         let idList = that.name + "-list";
@@ -269,7 +271,7 @@ class Filter {
 }
 
 //********************************INIT********************************************************/
-//création des 3 filtres qui contiendrons les objets associés "indredient" "ustensil" "appliance".
+// create 3 filters that contain associated: "ingredients", "tools" and "appliance"
 let ingredientFilter = new Filter("ingredients");
 let applianceFilter = new Filter("appliances");
 let ustensiltFilter = new Filter("ustensils");
@@ -289,7 +291,7 @@ recipes.forEach(oneProduct => {
     applianceFilter._addFilter(oneProduct.appliance);
     //allProducts.push(new Product(oneProduct.name, allIngredients, allUstensils, allAppliances, oneProduct.description, oneProduct.time));
 });
-//on affiche les filtres à l'initialisation
+// display of the filter at the init
 ingredientFilter._createFilterOnDom();
 ustensiltFilter._createFilterOnDom();
 applianceFilter._createFilterOnDom();
@@ -357,7 +359,7 @@ function mainSearch(type, mainSearchInput) {
         });
         displayedProduct = tempDisplayProduct;
     }
-    updateDom(displayedProduct);
     mainSearchEnd = performance.now();
+    updateDom(displayedProduct);
     console.log ("Main Search V2 Time: " + (mainSearchEnd - mainSearchStart) + 'ms' );
 }
