@@ -54,7 +54,6 @@ function updateDom (products){
     displayedProduct = products; 
     updateAllDisplayedProductV2();
     updateAllFilterV2();
-    udateResultNumber(displayedProduct.length);
 }
 
 
@@ -182,16 +181,6 @@ function updateAllFilterV2() {
     }
 }
 
-function udateResultNumber(number) {
-    let test = document.getElementById("resultsNumbers");
-    if (test.childNodes.length > 1) {
-        test.childNodes[1].replaceWith(number);
-    } else {
-        test.insertAdjacentText('beforeend', number);
-    }
-
-}
-
 function normalize(str) {
     return str.normalize('NFD').replace(/[\u0300-\u036f]/g, "").toUpperCase();
   }
@@ -298,7 +287,6 @@ applianceFilter._createFilterOnDom();
 
 // init display all products
 displayedProduct = recipes;
-udateResultNumber(displayedProduct.length);
 updateAllDisplayedProductV2();
 
 //*****************************************MAIN RESEARCH******************************** */
