@@ -43,6 +43,8 @@ function updateAllDisplayedProduct() {
     document.getElementById(idOfElement).innerHTML = resultTemplate;
 }
 
+//add methode trunc to string class
+// cut the string after "n" character and add ... behind the text
 String.prototype.trunc = 
     function (n){
         return this.substr(0,n-1)+(this.length > n ? '&hellip;':'')
@@ -51,8 +53,13 @@ String.prototype.trunc =
 function defaultProductDisplay (){
     displayedProduct = allProducts;
     unCheckProductOnAllProduct();
-    udateResultNumber(displayedProduct.length);
     updateAllDisplayedProduct()
+    updateAllFilter();
+}
+
+function updateDom (){
+    logAllProductWithTag();
+    updateAllDisplayedProduct();
     updateAllFilter();
 }
 
@@ -81,8 +88,6 @@ function unCheckProductOnAllProduct() {
 }
 
 function logAllProductWithTag(tagType) {
-    // purge the displayedProduct table before update with the new selection content
-    let tempProduct = displayedProduct;
     displayedProduct = [];
     allProducts.forEach(oneProduct => {
         oneProduct._isConcernedByFilter(tagType);
@@ -116,16 +121,13 @@ function addSelectedTag(selectedTag, filterName) {
     filter.addEventListener('click', RemoveTag);
 }
 
-// function qui mets à jour la liste de filtre en fonction des produits qui sont afficées
+// function to update the filter list with only dislpayed recipies
 function updateAllFilter() {
     if (displayedProduct.length != 0) {
-        // on vide la contenu de tout les filtres
         ingredientFilter.data = [];
         ustensiltFilter.data = [];
         applianceFilter.data = [];
-        //on recupère les 3 filtres
         let filterLists = document.querySelectorAll(".dropdown ul");
-        //pour chaue filtre on suprime tous les elements du DOM
         filterLists.forEach(filter => {
             if (filter.hasChildNodes) {
                 while (filter.firstChild) {
@@ -133,7 +135,6 @@ function updateAllFilter() {
                 }
             }
         });
-        //reconstruit les listes de filtre à partir des produits qui sont affichées sur le DOM.
         displayedProduct.forEach(oneProduct => {
             oneProduct.ingredients.forEach(oneIngredient => {
                 if (oneIngredient.isChecked === false) {
@@ -151,21 +152,10 @@ function updateAllFilter() {
                 }
             });
         });
-        // mise à jour du DOM
         ingredientFilter._createFilterOnDom();
         ustensiltFilter._createFilterOnDom();
         applianceFilter._createFilterOnDom();
     }
-}
-
-function udateResultNumber(number) {
-    let test = document.getElementById("resultsNumbers");
-    if (test.childNodes.length > 1) {
-        test.childNodes[1].replaceWith(number);
-    } else {
-        test.insertAdjacentText('beforeend', number);
-    }
-
 }
 
 function normalize(str) {
@@ -180,8 +170,6 @@ class Filter {
         this._createTagChoiseEvent();
         this._createTagListDisplayEvent();
         this._searchTagEvent();
-        //this._RemoveTagEvent()
-        //this._createTagListHiddenEvent()
     }
 
     _addFilter(newElement) {
@@ -204,8 +192,8 @@ class Filter {
         })
     }
 
-    // methode qui recupère l'élément qui à été cliqué par l'utilisateur dans la liste de filtre l'ajoute sous forme de Tag
-    //mets à jour et affiche la liste des rectees qui contiennent ce tag.
+    // get the element choise by the user and add tag
+    //update the displaed recipies with the selected tag
     _createTagChoiseEvent() {
         let that = this;
         let idList = that.name + "-list";
@@ -215,11 +203,7 @@ class Filter {
                 nbTagActive++;
                 addSelectedTag(tagName, that.name);
                 checkFilterElementOnAllProduct(tagName, that.name);
-                secondarySearch ();
-                // logAllProductWithTag(that.name);
-                // updateAllDisplayedProduct();
-                // updateAllFilter();
-                // udateResultNumber(displayedProduct.length);
+                updateDom ();
             }
         });
     }
@@ -234,6 +218,7 @@ class Filter {
         });
     }
 
+    // search element into the filter table and update the DOM 
     _searchTagEvent() {
         document.getElementById(this.name + "-search").addEventListener("input", (event) => {
             const list = document.querySelectorAll("#" + this.name + "-list" + "> .tag__filter");
@@ -342,9 +327,8 @@ class Product {
         this.isChecked = false;
     }
    
+    //methode to check if the product have all filter criteria
     _isConcernedByFilter(type) {
-        //console.log("nombre de filtre avtif dans le produit", this.name, ":", this.nbFilterActive);
-        //console.log("nombre de Tag actif sur le DOM :", nbTagActive);
         let mainSearchLength = document.getElementById("search-bar").value.length
         if (nbTagActive > 0) {
             if (mainSearchLength > 2) {
@@ -361,11 +345,11 @@ class Product {
     }
 }
 //********************************INIT********************************************************/
-//création des 3 filtres qui contiendrons les objets associés "indredient" "ustensil" "appliance".
+
 let ingredientFilter = new Filter("ingredients");
 let applianceFilter = new Filter("appliances");
 let ustensiltFilter = new Filter("ustensils");
-// creation du tableau de produit qui contiendra toutes les recettes sous forme d'objet.
+// array that contains all recipies
 let allProducts = [];
 
 recipes.forEach(oneProduct => {
@@ -382,14 +366,13 @@ recipes.forEach(oneProduct => {
     applianceFilter._addFilter(oneProduct.appliance);
     allProducts.push(new Product(oneProduct.name, allIngredients, allUstensils, allAppliances, oneProduct.description, oneProduct.time));
 });
-//on affiche les filtres à l'initialisation
+
 ingredientFilter._createFilterOnDom();
 ustensiltFilter._createFilterOnDom();
 applianceFilter._createFilterOnDom();
 
 // init display all products
 displayedProduct = allProducts;
-udateResultNumber(displayedProduct.length);
 updateAllDisplayedProduct();
 
 //*****************************************MAIN RESEARCH******************************** */
@@ -401,15 +384,10 @@ document.getElementById('search-bar')
         normalizeMainSearchInput = normalize(mainSearchString.trim());
         if (normalizeMainSearchInput.length > 2){
             mainSearch(type, normalizeMainSearchInput);
-        //}else if (nbTagActive > 0){
-         //   logAllProductWithTag(type);
-         //   udateResultNumber(displayedProduct.length);
-         //   updateAllDisplayedProduct();
-         //   updateAllFilter();
         }else if (nbTagActive == 0) {
             defaultProductDisplay ();
         }else{
-            secondarySearch ();
+            updateDom ();
         }
     });
 
@@ -421,17 +399,9 @@ function mainSearch(type, mainSearchInput) {
     let regEx = new RegExp("(" + mainSearchInput + ")", 'gi');
     checkProductOnAllProduct(regEx);
     logAllProductWithTag(type);
-    udateResultNumber(displayedProduct.length);
-    updateAllDisplayedProduct();
     mainSearchEnd = performance.now();
+    updateAllDisplayedProduct();
     updateAllFilter();
     console.log ("Main Search V1 Time: " + (mainSearchEnd - mainSearchStart) + 'ms' )
-}
-
-function secondarySearch (){
-    logAllProductWithTag();
-    updateAllDisplayedProduct();
-    updateAllFilter();
-    udateResultNumber(displayedProduct.length);
 }
 
