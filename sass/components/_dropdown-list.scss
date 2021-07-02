@@ -62,11 +62,20 @@ input::placeholder{
      display: none;
  }
 
+.input-group-size{
+    width: 41rem;
+    @media (max-width: 600px) {
+        width: 100%;
+    }
+}
+
 .displayedList{
+            position: absolute;
+            z-index: 1000;
             display :grid;
             grid-template-columns: auto auto auto;
-            max-width: 667px;
-            width: 667px;
+            max-width: 41rem;
+            width: 41rem;
             opacity: 1;
             padding: 10px;
             border-radius: 0 0 5px 5px;

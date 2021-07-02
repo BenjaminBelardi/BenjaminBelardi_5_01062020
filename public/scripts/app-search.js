@@ -210,8 +210,10 @@ class Filter {
 
     _createTagListDisplayEvent() {
         let listToDisplay = document.getElementById(this.name + "-list");
+        let inputGroup = document.getElementById(this.name);
         let iconToggle = document.querySelectorAll("#" + this.name + " .tag__icon");
         document.getElementById(this.name).addEventListener("click", function (event) {
+            inputGroup.classList.toggle("input-group-size");
             listToDisplay.classList.toggle("displayedList");
             iconToggle.forEach(icon => { icon.classList.toggle("hidden");
             });
