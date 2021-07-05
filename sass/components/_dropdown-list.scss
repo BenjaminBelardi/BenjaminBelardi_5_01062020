@@ -35,12 +35,6 @@
         padding-left: 1rem;
         color: white;
     }
-    // &__icon-up{
-    //      display: none;
-    //      & fa{
-    //          color:white;
-    //      }
-    // }
     &__icon{
         display: flex;
         align-items: center;
@@ -59,25 +53,35 @@ input::placeholder{
     margin-left: -1.5rem;
  }
 .hidden{
-     display: none;
+    display: none;
  }
 
+.input-group-size{
+    width: 41rem;
+    @media (max-width: 600px) {
+        width: 100%;
+    }
+}
+
 .displayedList{
-            display :grid;
-            grid-template-columns: auto auto auto;
-            max-width: 667px;
-            width: 667px;
-            opacity: 1;
-            padding: 10px;
-            border-radius: 0 0 5px 5px;
-            list-style: none;
-            margin-top: -5px;
-            cursor:pointer;
-            @media (max-width: 600px) {
-                max-width: none;
-                width: 100%;
-            }
+    display :grid;
+    position: absolute;
+    z-index: 1000;
+    grid-template-columns: auto auto auto;
+    max-width: 41rem;
+    width: 41rem;
+    opacity: 1;
+    padding: 10px;
+    border-radius: 0 0 5px 5px;
+    list-style: none;
+    margin-top: -5px;
+    cursor:pointer;
+    @media (max-width: 600px) {
+        max-width: none;
+        width: 100%;
         }
+}
+
 .tag__filter{
     padding: 10px;
     color: white;

@@ -27,7 +27,7 @@ function updateAllDisplayedProductV2() {
                         <div class="card__body">
                             <ul class="card__body__list">
                             ${result.ingredients.map(element => `
-                                <li><span class="bold">${element.ingredient} : </span>${element.quantity} ${element.unit}</li>`).join("")}
+                                <li><span class="bold">${element.ingredient} : </span>${typeof element.quantity == "undefined" ? "": element.quantity} ${typeof element.unit == "undefined" ? "": element.unit}</li>`).join("")}
                             </ul>
                             <p class="card__body__description truncate-overflow"><span> ${result.description.trunc(165)}</span></p>
                         </div>
@@ -235,8 +235,10 @@ class Filter {
 
     _createTagListDisplayEvent() {
         let listToDisplay = document.getElementById(this.name + "-list");
+        let inputGroup = document.getElementById(this.name);
         let iconToggle = document.querySelectorAll("#" + this.name + " .tag__icon");
         document.getElementById(this.name).addEventListener("click", function (event) {
+            inputGroup.classList.toggle("input-group-size");
             listToDisplay.classList.toggle("displayedList");
             iconToggle.forEach(icon => { icon.classList.toggle("hidden");
             });
