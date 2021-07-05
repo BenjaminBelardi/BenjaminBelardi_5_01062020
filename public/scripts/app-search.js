@@ -295,7 +295,7 @@ class Product {
 
     _checkFilterElement(elementName, type) {
         this[type].forEach(oneElement => {
-            if (oneElement.name == elementName) {
+            if (normalize(oneElement.name) == normalize(elementName)) {
                 oneElement.isChecked = true;
                 this.nbFilterActive++;
             }
