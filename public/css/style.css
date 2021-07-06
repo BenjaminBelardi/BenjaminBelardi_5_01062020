@@ -135,6 +135,10 @@ input::placeholder {
   }
 }
 
+.input-group {
+  min-width: 7rem;
+}
+
 .displayedList {
   position: absolute;
   z-index: 1000;
