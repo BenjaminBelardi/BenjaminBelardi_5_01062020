@@ -404,7 +404,7 @@ document.getElementById('search-bar')
         let mainSearchString = event.target.value.trim();
         normalizeMainSearchInput = normalize(mainSearchString.trim());
         if (normalizeMainSearchInput.length > 2 ){
-            if (isFirstResearch(normalizeMainSearchInput.length)){
+            if (isFirstResearch(normalizeMainSearchInput.length) && nbTagActive == 0){
                 mainSearch(type, normalizeMainSearchInput , allProducts);
             }else{
                 mainSearch(type, normalizeMainSearchInput , displayedProduct);
@@ -419,11 +419,11 @@ document.getElementById('search-bar')
 let mainSearchStart = 0;
 let mainSearchEnd = 0;
 
-function mainSearch(type, mainSearchInput, productList) {
+function mainSearch (mainSearchInput, productList) {
     mainSearchStart = performance.now();
     let regEx = new RegExp("(" + mainSearchInput + ")", 'gi');
     checkProductOnAllProduct(regEx , productList);
-    logAllProductWithTag(type);
+    logAllProductWithTag();
     mainSearchEnd = performance.now();
     updateAllDisplayedProduct();
     updateAllFilter();
