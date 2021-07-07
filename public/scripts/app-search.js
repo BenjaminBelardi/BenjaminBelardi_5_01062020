@@ -1,7 +1,13 @@
 
 import { recipes } from "./recipes.js";
-// litéral template for automatic cards creation
 
+
+// product list and filter initialisation at loading page
+window.addEventListener ('load', () =>{
+    init();
+});
+
+// litéral template for automatic cards creation
 let displayedProduct = [];
 let nbTagActive = 0;
 
@@ -43,6 +49,17 @@ function updateAllDisplayedProduct() {
     document.getElementById(idOfElement).innerHTML = resultTemplate;
 }
 
+
+let SearchLengthBack = 0;
+function isFirstResearch (searchLength){
+    let firstResearch = true ;
+    if (searchLength > SearchLengthBack && SearchLengthBack != 0){
+        firstResearch = false;
+    }
+    SearchLengthBack = searchLength;
+    return firstResearch;
+}
+
 //add methode trunc to string class
 // cut the string after "n" character and add ... behind the text
 String.prototype.trunc = 
@@ -75,8 +92,8 @@ function UnCheckFilterElement(elementName, type) {
     })
 }
 
-function checkProductOnAllProduct(regEx) {
-    allProducts.forEach(oneProduct => {
+function checkProductOnAllProduct(regEx , listOfProduct) {
+    listOfProduct.forEach(oneProduct => {
         oneProduct._checkProduct(regEx);
     })
 }
@@ -87,10 +104,10 @@ function unCheckProductOnAllProduct() {
     })
 }
 
-function logAllProductWithTag(tagType) {
+function logAllProductWithTag() {
     displayedProduct = [];
     allProducts.forEach(oneProduct => {
-        oneProduct._isConcernedByFilter(tagType);
+        oneProduct._isConcernedByFilter();
     });
 }
 
@@ -100,7 +117,7 @@ function RemoveTag(event) {
     this.remove();
     nbTagActive--;
     UnCheckFilterElement(tagName, attr);
-    mainSearch(event.type,normalizeMainSearchInput);
+    mainSearch(event.type,normalizeMainSearchInput, allProducts);
 }
 
 function addSelectedTag(selectedTag, filterName) {
@@ -330,7 +347,7 @@ class Product {
     }
    
     //methode to check if the product have all filter criteria
-    _isConcernedByFilter(type) {
+    _isConcernedByFilter() {
         let mainSearchLength = document.getElementById("search-bar").value.length
         if (nbTagActive > 0) {
             if (mainSearchLength > 2) {
@@ -348,34 +365,36 @@ class Product {
 }
 //********************************INIT********************************************************/
 
-let ingredientFilter = new Filter("ingredients");
-let applianceFilter = new Filter("appliances");
-let ustensiltFilter = new Filter("ustensils");
-// array that contains all recipies
-let allProducts = [];
+    let ingredientFilter = new Filter("ingredients");
+    let applianceFilter = new Filter("appliances");
+    let ustensiltFilter = new Filter("ustensils");
+    // array that contains all recipies
+    let allProducts = [];
 
-recipes.forEach(oneProduct => {
-    let allIngredients = [], allUstensils = [], allAppliances = [];
-    oneProduct.ingredients.forEach(oneIngredient => {
-        allIngredients.push(new Ingredient(oneIngredient.ingredient, oneIngredient.quantity, oneIngredient.unit));
-        ingredientFilter._addFilter(oneIngredient.ingredient);
+function init() {
+    recipes.forEach(oneProduct => {
+        let allIngredients = [], allUstensils = [], allAppliances = [];
+        oneProduct.ingredients.forEach(oneIngredient => {
+            allIngredients.push(new Ingredient(oneIngredient.ingredient, oneIngredient.quantity, oneIngredient.unit));
+            ingredientFilter._addFilter(oneIngredient.ingredient);
+        });
+        oneProduct.ustensils.forEach(oneUstensil => {
+            allUstensils.push(new Ustensil(oneUstensil));
+            ustensiltFilter._addFilter(oneUstensil);
+        });
+        allAppliances.push(new Appliance(oneProduct.appliance));
+        applianceFilter._addFilter(oneProduct.appliance);
+        allProducts.push(new Product(oneProduct.name, allIngredients, allUstensils, allAppliances, oneProduct.description, oneProduct.time));
     });
-    oneProduct.ustensils.forEach(oneUstensil => {
-        allUstensils.push(new Ustensil(oneUstensil));
-        ustensiltFilter._addFilter(oneUstensil);
-    });
-    allAppliances.push(new Appliance(oneProduct.appliance));
-    applianceFilter._addFilter(oneProduct.appliance);
-    allProducts.push(new Product(oneProduct.name, allIngredients, allUstensils, allAppliances, oneProduct.description, oneProduct.time));
-});
 
-ingredientFilter._createFilterOnDom();
-ustensiltFilter._createFilterOnDom();
-applianceFilter._createFilterOnDom();
+    ingredientFilter._createFilterOnDom();
+    ustensiltFilter._createFilterOnDom();
+    applianceFilter._createFilterOnDom();
 
-// init display all products
-displayedProduct = allProducts;
-updateAllDisplayedProduct();
+    // init display all products
+    displayedProduct = allProducts;
+    updateAllDisplayedProduct();
+}
 
 //*****************************************MAIN RESEARCH******************************** */
 let normalizeMainSearchInput ="";
@@ -384,8 +403,12 @@ document.getElementById('search-bar')
         let type = event.target.id;
         let mainSearchString = event.target.value.trim();
         normalizeMainSearchInput = normalize(mainSearchString.trim());
-        if (normalizeMainSearchInput.length > 2){
-            mainSearch(type, normalizeMainSearchInput);
+        if (normalizeMainSearchInput.length > 2 ){
+            if (isFirstResearch(normalizeMainSearchInput.length)){
+                mainSearch(type, normalizeMainSearchInput , allProducts);
+            }else{
+                mainSearch(type, normalizeMainSearchInput , displayedProduct);
+            }
         }else if (nbTagActive == 0) {
             defaultProductDisplay ();
         }else{
@@ -396,10 +419,10 @@ document.getElementById('search-bar')
 let mainSearchStart = 0;
 let mainSearchEnd = 0;
 
-function mainSearch(type, mainSearchInput) {
+function mainSearch(type, mainSearchInput, productList) {
     mainSearchStart = performance.now();
     let regEx = new RegExp("(" + mainSearchInput + ")", 'gi');
-    checkProductOnAllProduct(regEx);
+    checkProductOnAllProduct(regEx , productList);
     logAllProductWithTag(type);
     mainSearchEnd = performance.now();
     updateAllDisplayedProduct();
