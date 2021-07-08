@@ -117,7 +117,8 @@ function RemoveTag(event) {
     this.remove();
     nbTagActive--;
     UnCheckFilterElement(tagName, attr);
-    mainSearch(event.type,normalizeMainSearchInput, allProducts);
+    logAllProductWithTag()
+    //mainSearch(event.type,normalizeMainSearchInput, allProducts);
 }
 
 function addSelectedTag(selectedTag, filterName) {
@@ -405,9 +406,9 @@ document.getElementById('search-bar')
         normalizeMainSearchInput = normalize(mainSearchString.trim());
         if (normalizeMainSearchInput.length > 2 ){
             if (isFirstResearch(normalizeMainSearchInput.length) && nbTagActive == 0){
-                mainSearch(type, normalizeMainSearchInput , allProducts);
+                mainSearch(normalizeMainSearchInput , allProducts);
             }else{
-                mainSearch(type, normalizeMainSearchInput , displayedProduct);
+                mainSearch(normalizeMainSearchInput , displayedProduct);
             }
         }else if (nbTagActive == 0) {
             defaultProductDisplay ();
