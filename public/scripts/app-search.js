@@ -117,8 +117,7 @@ function RemoveTag(event) {
     this.remove();
     nbTagActive--;
     UnCheckFilterElement(tagName, attr);
-    logAllProductWithTag()
-    //mainSearch(event.type,normalizeMainSearchInput, allProducts);
+    mainSearch(normalizeMainSearchInput, allProducts);
 }
 
 function addSelectedTag(selectedTag, filterName) {
